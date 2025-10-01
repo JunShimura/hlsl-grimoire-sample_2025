@@ -35,9 +35,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="system\system.cpp">
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
@@ -110,9 +107,6 @@
     <ClCompile Include="..\..\MiniEngine\HID\GamePad.cpp">
       <Filter>MiniEngine\HID</Filter>
     </ClCompile>
-    <ClCompile Include="TrianglePolygon.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\MiniEngine\tkEngine.cpp">
       <Filter>MiniEngine</Filter>
     </ClCompile>
@@ -163,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="..\..\MiniEngine\font\Font.cpp">
       <Filter>MiniEngine\font</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadObjPolygon.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="main.ObjPolygon.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -250,9 +250,6 @@
     <ClInclude Include="..\..\MiniEngine\HID\GamePad.h">
       <Filter>MiniEngine\HID</Filter>
     </ClInclude>
-    <ClInclude Include="TrianglePolygon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\MiniEngine\tkEngine.h">
       <Filter>MiniEngine</Filter>
     </ClInclude>
@@ -306,6 +303,9 @@
     </ClInclude>
     <ClInclude Include="..\..\MiniEngine\font\FontEngine.h">
       <Filter>MiniEngine\font</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadObjPolygon.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
