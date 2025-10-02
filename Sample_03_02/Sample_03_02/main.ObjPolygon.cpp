@@ -83,11 +83,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
         // ワールド行列を作成
         Matrix mWorld;
-        mWorld.MakeLookAt( 
-            Vector3(1.0f, 1.0f, 10.0f), // カメラの位置
-            Vector3(0.0f, 0.0f, 0.0f),  // カメラの注視点
-            Vector3(0.0f, 1.0f, 0.0f)   // カメラの上方向
-		);
+		mWorld.MakeScaling( // スケーリング行列
+            Vector3(
+                (float)FRAME_BUFFER_H/FRAME_BUFFER_W,
+                1.0f,
+				1.0f) * 0.5f // 画面のアスペクト比を考慮して縮小
+        ); 
+
         // ワールド行列をグラフィックメモリにコピー
         cb.CopyToVRAM(mWorld);
 
