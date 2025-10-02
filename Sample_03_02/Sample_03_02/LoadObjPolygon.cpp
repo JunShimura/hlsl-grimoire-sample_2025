@@ -27,8 +27,8 @@ void LoadObjPolygon::Draw(RenderContext& rc)
 }
 void LoadObjPolygon::LoadShaders()
 {
-	m_vertexShader.LoadVS("Assets/shader/sample_objPolygon.fx", "VSMain");
-	m_pixelShader.LoadPS("Assets/shader/sample_objPolygon.fx", "PSMain");
+	m_vertexShader.LoadVS("Assets/shader/sample.fx", "VSMain");
+	m_pixelShader.LoadPS("Assets/shader/sample.fx", "PSMain");
 }
 void LoadObjPolygon::InitPipelineState(RootSignature& rs)
 {

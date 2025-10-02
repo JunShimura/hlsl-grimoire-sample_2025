@@ -207,6 +207,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="system\system.cpp" />
+    <ClCompile Include="TrianglePolygon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\MiniEngine\Animation.h" />
@@ -256,6 +257,7 @@
     <ClInclude Include="LoadObjPolygon.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
+    <ClInclude Include="TrianglePolygon.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\image\sample_00.png" />
