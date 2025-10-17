@@ -1,0 +1,7 @@
+#pragma once
+
+#include <string>
+
+// OBJ(.obj) + MTL(.mtl) を読み、TkmFile::Load と互換の .tkm バイナリを生成する。
+// 戻り値: 成功なら true。
+bool ConvertObjToTkm(const char* objFilePath, const char* outTkmFilePath);

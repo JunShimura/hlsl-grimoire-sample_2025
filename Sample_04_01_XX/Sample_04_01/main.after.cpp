@@ -1,5 +1,6 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "system/system.h"
+#include "ObjToTkm.h"
 
 ///////////////////////////////////////////////////////////////////
 // ウィンドウプログラムのメイン関数
@@ -15,13 +16,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
     g_camera3D->SetPosition({ 0.0f, 50.0f, 100.0f });
 
+    // OBJ -> TKM 変換: "defaultCube.obj" から TKM を生成して読み込む
+    const char* objPath = "Assets/modelData/defaultCube.obj";
+    const char* tkmPath = "Assets/modelData/defaultCube.tkm";
+    // 変換に失敗した場合は既存の sample.tkm をフォールバックとして使用
+    bool converted = ConvertObjToTkm(objPath, tkmPath);
+
     // step-1 3Dモデルをロードするための情報を設定する
     // まず、モデルを初期化するための情報を設定する
     ModelInitData initData;
     // .tkmファイルのファイルパスを設定する
-    initData.m_tkmFilePath = "Assets/modelData/sample.tkm";
+    initData.m_tkmFilePath = converted ? tkmPath : "Assets/modelData/sample.tkm";
     // 使用するシェーダーファイルパスを設定する
-    initData.m_fxFilePath = "Assets/shader/sample.fx";
+    initData.m_fxFilePath = "Assets/shader/sample.after.fx";
 
     // step-2 初期化情報を使ってモデル表示処理を初期化する
     Model charaModel;

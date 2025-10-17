@@ -35,9 +35,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="system\system.cpp">
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
@@ -160,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="..\..\MiniEngine\font\Font.cpp">
       <Filter>MiniEngine\font</Filter>
+    </ClCompile>
+    <ClCompile Include="main.after.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjToTkm.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +306,9 @@
     </ClInclude>
     <ClInclude Include="..\..\MiniEngine\font\FontEngine.h">
       <Filter>MiniEngine\font</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjToTkm.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
