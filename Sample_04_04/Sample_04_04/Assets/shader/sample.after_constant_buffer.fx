@@ -39,9 +39,9 @@ cbuffer ModelCb : register(b0)
 cbuffer DirectionLightCb : register(b1)
 {
     DirectionLight directionLight;
-    float3 eyePos;          // 視点の位置
+    float4 eyePos;          // 視点の位置
     float3 ambientLight;    // アンビエントライト
-	float reflectionStrength;
+	// float reflectionStrength;
 };
 
 ///////////////////////////////////////////
@@ -96,7 +96,7 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     float3 refVec = reflect(directionLight.direction, psIn.normal);
 
     // step-5 光が当たったサーフェイスから視点に伸びるベクトルを求める
-    float3 toEye = eyePos - psIn.worldPos;
+    float3 toEye = eyePos.xyz - psIn.worldPos;
     toEye = normalize(toEye);
 
     // step-6 鏡面反射の強さを求める
@@ -107,7 +107,9 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     }
 
     // step-7 鏡面反射の強さを絞る
-	t = pow(t, reflectionStrength);
+    // t = pow(t, 5.0f);
+	t = pow(t, eyePos.w);
+    
 
     // step-8 鏡面反射光を求める
     float3 specularLig = directionLight.color * t;

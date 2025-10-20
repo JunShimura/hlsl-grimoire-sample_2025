@@ -19,10 +19,9 @@ struct Light
 {
     DirectionLight directionLight;  // ディレクションライト
     Vector3 eyePos;                 // 視点の位置
-    float pad1;
+    float reflectionStrength;	  // 鏡面反射の強さ
     Vector3 ambientLight;           // 環境光
     float pad2;
-	float reflectionStrength;	  // 鏡面反射の強さ
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -62,7 +61,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     light.ambientLight.z = 0.1f;
 
 	// 鏡面反射の強さを設定する
-	light.reflectionStrength = 5.0f;
+	light.reflectionStrength = 50.0f;
 
     // モデルを初期化する
     // モデルを初期化するための情報を構築する
