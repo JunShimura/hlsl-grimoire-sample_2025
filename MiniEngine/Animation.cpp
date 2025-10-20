@@ -1,4 +1,4 @@
-﻿/*!
+/*!
 * @brief	アニメータークラス。
 */
 #include "stdafx.h"
