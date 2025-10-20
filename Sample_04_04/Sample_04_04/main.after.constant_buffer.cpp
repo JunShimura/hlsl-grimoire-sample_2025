@@ -21,6 +21,8 @@ struct Light
     Vector3 eyePos;                 // 視点の位置
     float pad1;
     Vector3 ambientLight;           // 環境光
+    float pad2;
+	float reflectionStrength;	  // 鏡面反射の強さ
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -55,9 +57,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // 視点の位置を設定する
     light.eyePos = g_camera3D->GetPosition();
 
-    light.ambientLight.x = 0.3f;
-    light.ambientLight.y = 0.3f;
-    light.ambientLight.z = 0.3f;
+    light.ambientLight.x = 0.1f;
+    light.ambientLight.y = 0.1f;
+    light.ambientLight.z = 0.1f;
+
+	// 鏡面反射の強さを設定する
+	light.reflectionStrength = 5.0f;
 
     // モデルを初期化する
     // モデルを初期化するための情報を構築する
@@ -65,7 +70,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     modelInitData.m_tkmFilePath = "Assets/modelData/teapot.tkm";
 
     // 使用するシェーダーファイルパスを設定する
-    modelInitData.m_fxFilePath = "Assets/shader/sample.fx";
+    modelInitData.m_fxFilePath = "Assets/shader/sample.after_constant_buffer.fx";
 
     // ディレクションライトの情報を定数バッファとしてディスクリプタヒープに登録するために
     // モデルの初期化情報として渡す

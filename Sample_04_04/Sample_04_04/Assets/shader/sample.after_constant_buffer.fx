@@ -41,6 +41,7 @@ cbuffer DirectionLightCb : register(b1)
     DirectionLight directionLight;
     float3 eyePos;          // 視点の位置
     float3 ambientLight;    // アンビエントライト
+	float reflectionStrength;
 };
 
 ///////////////////////////////////////////
@@ -106,7 +107,7 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     }
 
     // step-7 鏡面反射の強さを絞る
-    t = pow(t, 5.0f);
+	t = pow(t, reflectionStrength);
 
     // step-8 鏡面反射光を求める
     float3 specularLig = directionLight.color * t;
