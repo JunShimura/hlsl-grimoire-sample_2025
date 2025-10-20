@@ -100,7 +100,7 @@ bool ConvertObjToTkm(const char* objFilePath, const char* outTkmFilePath)
 {
 	std::ifstream ifs(objFilePath);
 	if (!ifs.is_open()) {
-		char buf[512]; sprintf(buf, "objファイルを開けません: %s", objFilePath);
+		char buf[512]; sprintf(buf, "Unable to open the OBJ file: %s", objFilePath);
 		MessageBoxA(nullptr, buf, "error", MB_OK);
 		return false;
 	}

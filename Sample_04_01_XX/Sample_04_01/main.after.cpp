@@ -17,16 +17,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     g_camera3D->SetPosition({ 0.0f, 50.0f, 100.0f });
 
     // OBJ -> TKM 変換: "defaultCube.obj" から TKM を生成して読み込む
-    const char* objPath = "Assets/modelData/defaultCube.obj";
-    const char* tkmPath = "Assets/modelData/defaultCube.tkm";
+    const char* objPath = "Assets/modelData/DefaultCube.obj";
+    const char* tkmPath = "Assets/modelData/DefaultCube.tkm";
     // 変換に失敗した場合は既存の sample.tkm をフォールバックとして使用
     bool converted = ConvertObjToTkm(objPath, tkmPath);
-
+	// converted = true; // 毎回変換するのは面倒なので、常に true  しておく（デバッグ用）
     // step-1 3Dモデルをロードするための情報を設定する
     // まず、モデルを初期化するための情報を設定する
     ModelInitData initData;
     // .tkmファイルのファイルパスを設定する
     initData.m_tkmFilePath = converted ? tkmPath : "Assets/modelData/sample.tkm";
+    // initData.m_tkmFilePath = converted ? tkmPath : "Assets/modelData/DedaultCube.tkm";
     // 使用するシェーダーファイルパスを設定する
     initData.m_fxFilePath = "Assets/shader/sample.after.fx";
 
