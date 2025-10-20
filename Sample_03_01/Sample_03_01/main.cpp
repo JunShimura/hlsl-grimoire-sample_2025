@@ -2,6 +2,9 @@
 #include "system/system.h"
 #include "TrianglePolygon.h"
 
+
+#include <cmath>
+
 //関数宣言
 void InitRootSignature(RootSignature& rs);
 
@@ -26,17 +29,24 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     triangle.Init(rootSignature);
 
     // step-1 定数バッファを作成
+    ConstantBuffer cb;
+    cb.Init(sizeof(Matrix));
 
     // step-2 ディスクリプタヒープを作成
+    DescriptorHeap ds;
+    ds.RegistConstantBuffer(0, cb);   // ディスクリプターヒープに定数バッファを登録
+	ds.Commit();                       // ディスクリプターヒープへの登録を確定
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
     //////////////////////////////////////
     auto& renderContext = g_graphicsEngine->GetRenderContext();
-
+    
+    float f = 0.0f;
     // ここからゲームループ
     while (DispatchWindowMessage())
     {
+		f += 0.01f; 
         //フレーム開始
         g_engine->BeginFrame();
 
@@ -48,11 +58,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         renderContext.SetRootSignature(rootSignature);
 
         // step-3 ワールド行列を作成
-
+        Matrix mWorld;
+		mWorld.MakeTranslation(0.5f, 0.4f, 0.0f); 
+		Matrix mRot;
+       	mRot.MakeRotationZ(f);
+		mWorld = mRot*mWorld;
         // step-4 ワールド行列をグラフィックメモリにコピー
-
+		cb.CopyToVRAM(mWorld);
         // step-5 ディスクリプタヒープを設定
-
+		renderContext.SetDescriptorHeap(ds);
         //三角形をドロー
         triangle.Draw(renderContext);
 
