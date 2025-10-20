@@ -130,7 +130,6 @@ _TeamCity*
 
 # AxoCover is a Code Coverage Tool
 .axoCover/*
-!.axoCover/settings.json
 
 # Visual Studio code coverage results
 *.coverage
@@ -328,3 +327,12 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# --- Project-specific: ensure Assets/ModelData is tracked ---
+# 必要に応じて Assets/ModelData 配下の全ファイルを再包含（negate）
+!Assets/
+!Assets/ModelData/
+!Assets/ModelData/**
+# 明確に .obj 等を再包含（一般的な拡張子無視ルールより後に評価されます）
+!Assets/ModelData/*.obj
+!Assets/ModelData/**/*.obj
