@@ -45,7 +45,7 @@ private:
 	/// <summary>
 	/// 頂点バッファを作成。
 	/// </summary>
-	void InitVertexBuffer();
+	void InitVertexBuffer(char* path = nullptr);
 	/// <summary>
 	/// インデックスバッファを作成。
 	/// </summary>

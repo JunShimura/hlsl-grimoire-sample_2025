@@ -88,9 +88,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
                 (float)FRAME_BUFFER_H/FRAME_BUFFER_W,
                 1.0f,
 				1.0f) * 0.5f // 画面のアスペクト比を考慮して縮小
-        ); 
-
+        );
+		Matrix mRot;   // 回転行列
+        mRot.MakeRotationX(0.25f); // X軸回転
         // ワールド行列をグラフィックメモリにコピー
+        mWorld *= mRot; // ワールド行列に回転を反映
         cb.CopyToVRAM(mWorld);
 
         // ディスクリプタヒープを設定
