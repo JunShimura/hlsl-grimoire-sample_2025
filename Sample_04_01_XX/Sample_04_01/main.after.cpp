@@ -17,8 +17,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     g_camera3D->SetPosition({ 0.0f, 50.0f, 100.0f });
 
     // OBJ -> TKM 変換: "defaultCube.obj" から TKM を生成して読み込む
-    const char* objPath = "Assets/modelData/DefaultCube.obj";
-    const char* tkmPath = "Assets/modelData/DefaultCube.tkm";
+    //const char* objPath = "Assets/modelData/DefaultCube.obj";
+    //const char* tkmPath = "Assets/modelData/DefaultCube.tkm";
+    const char* objPath = "Assets/modelData/Dice.obj";
+    const char* tkmPath = "Assets/modelData/Dice.tkm";
+
     // 変換に失敗した場合は既存の sample.tkm をフォールバックとして使用
     bool converted = ConvertObjToTkm(objPath, tkmPath);
 	// converted = true; // 毎回変換するのは面倒なので、常に true  しておく（デバッグ用）

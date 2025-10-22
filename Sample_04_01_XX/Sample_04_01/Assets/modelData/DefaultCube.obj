@@ -1,5 +1,8 @@
 # Blender 4.5.3 LTS
 # www.blender.org
+mtllib DefaultCube.mtl     # 使用するマテリアルファイルを指定
+usemtl Material
+
 o Cube
 v 1.000000 1.000000 -1.000000
 v 1.000000 -1.000000 -1.000000
