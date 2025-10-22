@@ -329,10 +329,9 @@ ASALocalRun/
 .mfractor/
 
 # --- Project-specific: ensure Assets/ModelData is tracked ---
-# 必要に応じて Assets/ModelData 配下の全ファイルを再包含（negate）
+
+# --- Ensure Assets .obj are tracked (must be after generic ignores) ---
 !Assets/
-!Assets/ModelData/
-!Assets/ModelData/**
-# 明確に .obj 等を再包含（一般的な拡張子無視ルールより後に評価されます）
-!Assets/ModelData/*.obj
-!Assets/ModelData/**/*.obj
+!Assets/**/
+!Assets/**/*.obj
+!Assets/*.obj
