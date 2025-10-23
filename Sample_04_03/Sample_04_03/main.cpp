@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "system/system.h"
 
 struct DirectionLight
@@ -47,7 +47,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // モデルを初期化する
     // モデルを初期化するための情報を構築する
     ModelInitData modelInitData;
-    modelInitData.m_tkmFilePath = "Assets/modelData/teapot.tkm";
+    // modelInitData.m_tkmFilePath = "Assets/modelData/teapot.tkm";
+    modelInitData.m_tkmFilePath = "Assets/modelData/TexDice.tkm";
 
     // 使用するシェーダーファイルパスを設定する
     modelInitData.m_fxFilePath = "Assets/shader/sample.fx";
@@ -60,6 +61,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // 初期化情報を使ってモデルを初期化する
     Model model;
     model.Init(modelInitData);
+
+
+
+    // ここでダイスにスケールと回転を適用する
+    {
+        // Y回転60度、X回転30度（順序：まずY、その後X を適用）
+        Matrix mRotY, mRotX, mRot;
+        mRotY.MakeRotationY(Math::DegToRad(60.0f));
+        mRotX.MakeRotationX(Math::DegToRad(30.0f));
+        // 行列を掛ける順序は、v' = Mx * (My * v) として先にY回転、その後X回転を適用する
+        mRot = mRotX * mRotY;
+
+        Quaternion modelRot;
+        modelRot.SetRotation(mRot);
+
+        // 位置は原点、回転は上で作成したもの、スケールは20倍
+        model.UpdateWorldMatrix({ 0.0f, 0.0f, 0.0f }, modelRot, g_vec3One * 20.0f);
+    }
+
+
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
