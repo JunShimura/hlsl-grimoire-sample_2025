@@ -17,10 +17,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     g_camera3D->SetPosition({ 0.0f, 50.0f, 100.0f });
 
     // OBJ -> TKM 変換: "defaultCube.obj" から TKM を生成して読み込む
-    //const char* objPath = "Assets/modelData/DefaultCube.obj";
-    //const char* tkmPath = "Assets/modelData/DefaultCube.tkm";
-    const char* objPath = "Assets/modelData/Dice.obj";
-    const char* tkmPath = "Assets/modelData/Dice.tkm";
+    // const char* objPath = "Assets/modelData/DefaultCube.obj";
+    // const char* tkmPath = "Assets/modelData/DefaultCube.tkm";
+    const char* objPath = "Assets/modelData/TexDice.obj";
+    const char* tkmPath = "Assets/modelData/TexDice.tkm";
 
     // 変換に失敗した場合は既存の sample.tkm をフォールバックとして使用
     bool converted = ConvertObjToTkm(objPath, tkmPath);
@@ -37,6 +37,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // step-2 初期化情報を使ってモデル表示処理を初期化する
     Model charaModel;
     charaModel.Init(initData);
+
+    // ここでワールド行列のスケールを指定（例：2倍に拡大）
+    charaModel.UpdateWorldMatrix(g_vec3Zero, g_quatIdentity, Vector3(20.0f, 20.0f, 20.0f));
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！

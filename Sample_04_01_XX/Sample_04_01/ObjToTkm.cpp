@@ -271,7 +271,7 @@ bool ConvertObjToTkm(const char* objFilePath, const char* outTkmFilePath)
 	// --- header ---
 	// version(uint8_t), isFlat(uint8_t), numMeshParts(uint16_t)
 	uint8_t version = 100;
-	uint8_t isFlat = 0;
+	uint8_t isFlat = 1; // スムージング（平均化）を無効化 -> フラット扱いにする
 	uint16_t numMeshParts = 1;
 	fwrite(&version, sizeof(version), 1, fp);
 	fwrite(&isFlat, sizeof(isFlat), 1, fp);

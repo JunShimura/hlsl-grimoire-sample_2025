@@ -33,6 +33,9 @@
     <Filter Include="MiniEngine\font">
       <UniqueIdentifier>{f42ca3f1-0e23-4435-beda-8bd4e4a810af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{a228fae6-49c4-4a08-bff3-b7878968b6c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="system\system.cpp">
@@ -310,5 +313,15 @@
     <ClInclude Include="ObjToTkm.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\modelData\TexDice.mtl">
+      <Filter>Model</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\modelData\TexDice.dds">
+      <Filter>Model</Filter>
+    </Image>
   </ItemGroup>
 </Project>
