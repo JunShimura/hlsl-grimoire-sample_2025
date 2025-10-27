@@ -39,13 +39,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     charaModel.Init(initData);
 
     // ここでワールド行列のスケールを指定（例：2倍に拡大）
-    charaModel.UpdateWorldMatrix(g_vec3Zero, g_quatIdentity, Vector3(20.0f, 20.0f, 20.0f));
+    charaModel.UpdateWorldMatrix(
+		Vector3(0.0f, 10.0f, 0.0f),         // position
+		Quaternion(0.0f, 1.0f, 0.0f, 0.5f), // rotation (Y回転)
+		Vector3(10.0f, 10.0f, 10.0f)        // scale
+    );
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
     //////////////////////////////////////
     auto& renderContext = g_graphicsEngine->GetRenderContext();
 
+	float angle = 0.0f;
     // ここからゲームループ
     while (DispatchWindowMessage())
     {
@@ -55,7 +60,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //////////////////////////////////////
         // ここから絵を描くコードを記述する
         //////////////////////////////////////
-
+		angle += 0.01f;
+		//charaModel.UpdateWorldMatrix(
+		//	Vector3(0.0f, 0.0f, 0.0f),                 // position
+		//	Quaternion(0.0f, 1.0f, 0.0f, angle), // rotation (Y回転)
+		//	Vector3(1.0f, 1.0f, 1.0f)            // scale
+		//);
         // step-3 モデルのドローコールを実行する
         charaModel.Draw(renderContext);
 
