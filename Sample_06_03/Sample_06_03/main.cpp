@@ -37,17 +37,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // ライトを用意する
     Light light;
 
-    light.color.x = 0.0f;
-    light.color.y = 0.0f;
-    light.color.z = 0.0f;
+    light.color.x = 0.25f;
+    light.color.y = 0.25f;
+    light.color.z = 0.25f;
 
     light.direction.x = 1.0f;
     light.direction.y = -1.0f;
     light.direction.z = -1.0f;
 
-    light.ambinetLight.x = 1.0f;
-    light.ambinetLight.y = 1.0f;
-    light.ambinetLight.z = 1.0f;
+    light.ambinetLight.x = 0.125f;
+    light.ambinetLight.y = 0.125f;
+    light.ambinetLight.z = 0.125f;
 
     light.eyePos = g_camera3D->GetPosition();
     light.specPow = 5.0f;
