@@ -16,5 +16,20 @@ sampler g_sampler : register(s0);
 Texture2D g_texture : register(t0);
 
 // step-9 頂点シェーダーを実装
+// 1.引数変換前の頂点情報
+// 2.返り値は変換後の頂点情報
+VSOutput VSMain(VSInput In)
+{
+	VSOutput vsOut = (VSOutput)0;
+    vsOut.pos = In.pos;
+    vsOut.uv = In.uv;
+    return vsOut;
+}
 
 // step-10 ピクセルシェーダーを実装
+// 1.引数は頂点シェーダーの出力をもとに計算された情報
+// 2.返り値は最終的なピクセルの色
+float4 PSMain(VSOutput In) : SV_Target0
+{
+    return g_texture.Sample(g_sampler, In.uv);
+}
