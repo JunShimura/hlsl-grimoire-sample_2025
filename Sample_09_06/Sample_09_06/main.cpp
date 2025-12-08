@@ -64,7 +64,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         // ここから絵を描くコードを記述する
         //////////////////////////////////////
         //ワイプサイズを増やして少しずつワイプさせる
-        wipeSize += 1.0f;
+        wipeSize += 0.0625f;
 
         // スプライトのドローコールを実行する
         test2D.Draw(renderContext);
