@@ -41,6 +41,8 @@ float4 PSMain(PSInput In) : SV_Target0
     float4 color = colorTexture.Sample(Sampler, In.uv);
 
     // step-1 画像を徐々にネガポジ反転させていく
-
+	float3 negaColor = float3(1.0f, 1.0f, 1.0f) - color.rgb;
+	float4 negaposiColor;
+    color.rgb = lerp(color.rgb, negaColor, negaRate);
     return color;
 }

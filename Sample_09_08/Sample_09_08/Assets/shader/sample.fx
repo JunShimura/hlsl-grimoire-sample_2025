@@ -41,6 +41,13 @@ float4 PSMain(PSInput In) : SV_Target0
     float4 color = colorTexture.Sample(Sampler, In.uv);
 
     // step-1 画像を徐々にセピア調に変化させていく
-
+    // ピクセルの明るさを計算する
+	float Y = dot(color.rgb, float3(0.299, 0.587, 0.114));
+    // セピア調ではモノクロ化とは違い、R,G,Bに明るさをそのまま代入しない
+    // 今回の実装では赤味の成分に0.9．緑に0.7、青に0.4を乗算してセピア調に変化させる
+	float3 sepiaColor = float3(Y * 0.9f, Y * 0.7f, Y * 0.4f);
+    
+    // セピア率に応じて元の色とセピア調の色を線形補間する
+	color.rgb = lerp(color.rgb, sepiaColor, sepiaRate);
     return color;
 }

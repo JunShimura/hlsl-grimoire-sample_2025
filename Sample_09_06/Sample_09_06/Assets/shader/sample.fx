@@ -39,10 +39,17 @@ PSInput VSMain(VSInput In)
 float4 PSMain(PSInput In) : SV_Target0
 {
     float4 color = colorTexture.Sample(Sampler, In.uv);
-	float2 v1 = normalize(float2(3.0, 4.0));
-	float2 v2 = normalize(float2(3.0, 2.0));
 
-	float2 v3 = float2(dot(v1, In.pos.xy), dot(v2, In.pos.xy));
+//	float2 v1 = normalize(float2(3.0, 4.0));
+//	float2 v2 = normalize(float2(3.0, 2.0));
+//	float2 v3 = float2(dot(v1, In.pos.xy), dot(v2, In.pos.xy));
+
+	float2 v3 = float2(
+        dot(float2(1.0f, 0.0f), float2(640, 320) - In.pos.xy)*100,
+    	length(float2(640, 320) - In.pos.xy)
+    );
+
+
     
     // step-1 チェッカーボードワイプを実装する
     // 1.ピクセルのY座標を128で割って、小数点以下を切り捨て、行番号を求める

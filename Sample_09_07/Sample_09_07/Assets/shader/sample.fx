@@ -41,6 +41,15 @@ float4 PSMain(PSInput In) : SV_Target0
     float4 color = colorTexture.Sample(Sampler, In.uv);
 
     // step-1 画像を徐々にモノクロに変化させていく
-
+    // ピクセルの明るさを計算する
+	float Y = 0.299f * color.r + 0.587f * color.g + 0.114f * color.b;
+    //float Y = dot(color.rgb, float3(0.2126, 0.7152, 0.0722));
+	//float Y = (color.r + color.g + color.b) / 3.0f;
+    
+    // 明るさの値をRGBに設定して、モノクロカラーを作成する
+	float3 monochromeColor = float3(Y, Y, Y);
+    
+	color.xyz = lerp(color.xyz, monochromeColor, monochromeRate);
+    
     return color;
 }
