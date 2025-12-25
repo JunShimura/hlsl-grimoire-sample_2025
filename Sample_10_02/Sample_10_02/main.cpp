@@ -18,6 +18,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //////////////////////////////////////
 
     // step-1 オフスクリーン描画用のレンダリングターゲットを作成
+	// RenderTargetオブジェクトを作成
+	RenderTarget offscreenRenderTarget;
+	// RenderTargetの初期化
+	offscreenRenderTarget.Create(
+		FRAME_BUFFER_W  ,	// 幅
+		FRAME_BUFFER_H,	    // 高さ
+		1,				  // ミップレベル数
+		1,                // 配列サイズ
+		DXGI_FORMAT_R8G8B8A8_UNORM, // フォーマット
+		DXGI_FORMAT_D32_FLOAT	   // 深度ステンシルフォーマット
+	);
 
     // 各種モデルを初期化する
     // 背景モデルを初期化
@@ -37,6 +48,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     plModel.Init(plModelInitData);
 
     // step-2 ポストエフェクト実行用のスプライトを初期化する
+	// スプライトの初期化データを作成
+	SpriteInitData spriteInitData;
+
+	// 【重要！！】テクスチャはオフスクリーンレンダリングターゲットのものを指定する
+	spriteInitData.m_textures[0] = &offscreenRenderTarget.GetRenderTargetTexture();
+
+	// 【重要！！】スプライトの描画領域を画面全体にする
+	spriteInitData.m_width = (float)FRAME_BUFFER_W;
+	spriteInitData.m_height = (float)FRAME_BUFFER_H;
+
+	// 【重要！！】モノクロ用のシェーダーを指定する
+	spriteInitData.m_fxFilePath = "Assets/shader/samplePostEffect.fx";
+
+	// スプライトを作成
+    Sprite MonochromeSprite;
+	MonochromeSprite.Init(spriteInitData);
     
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
@@ -54,13 +81,37 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //////////////////////////////////////
 
         // step-3 レンダリングターゲットを変更する
+		RenderTarget* rtArray[] = { &offscreenRenderTarget };
 
+        // レンダーターゲットとして利用できるまで待つ
+		renderContext.WaitUntilToPossibleSetRenderTargets(1,rtArray);
+
+        // レンダリングターゲットを設定
+        renderContext.SetRenderTargets(1, rtArray);
+
+        // レンダリングターゲットをクリア
+		renderContext.ClearRenderTargetViews(1, rtArray);
+        
         // step-4 offscreenRenderTargetに各種モデルを描画する
+		// 背景モデルを描画
+		bgModel.Draw(renderContext);
+
+		// プレイヤーモデルを描画
+		plModel.Draw(renderContext);
+
+		// レンダーターゲットへの書き込み終了待ち
+		renderContext.WaitUntilFinishDrawingToRenderTargets(0, nullptr);
 
         // step-5 画面に表示されるレンダリングターゲットに戻す
+        renderContext.SetRenderTarget(
+			g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
+			g_graphicsEngine->GetCurrentFrameBuffuerDSV()
+		);
 
+        
         // step-6 フルスクリーン表示のスプライトを描画する
-
+		MonochromeSprite.Draw(renderContext);   
+        
         //////////////////////////////////////
         // 絵を描くコードを書くのはここまで！！！
         //////////////////////////////////////
