@@ -72,5 +72,7 @@ SPSIn VSMain(SVSIn vsIn)
 /// </summary>
 float4 PSMain(SPSIn psIn) : SV_Target0
 {
+
     return g_albedo.Sample(g_sampler, psIn.uv);
+    
 }
