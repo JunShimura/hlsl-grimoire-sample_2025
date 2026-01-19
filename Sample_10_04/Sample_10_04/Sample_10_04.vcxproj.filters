@@ -161,8 +161,8 @@
     <ClCompile Include="..\..\MiniEngine\font\Font.cpp">
       <Filter>MiniEngine\font</Filter>
     </ClCompile>
-    <ClCompile Include="main.after.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル\system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

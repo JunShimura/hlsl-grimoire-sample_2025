@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "system/system.h"
 
 const int NUM_DIRECTIONAL_LIGHT = 4; // ディレクションライトの数
@@ -96,7 +96,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		1,
 		1,
 		DXGI_FORMAT_R8G8B8A8_UNORM, // レンダリングターゲットのフォーマット
-		DXGI_FORMAT_UNKNOWN // 深度ステンシルのフォーマット
+		DXGI_FORMAT_D32_FLOAT // 深度ステンシルのフォーマット
 	);
 
 	// step-4 横ブラー用のスプライトを初期化

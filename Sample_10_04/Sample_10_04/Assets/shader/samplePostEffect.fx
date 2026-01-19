@@ -206,16 +206,16 @@ float4 PSBlur(PS_BlurInput In) : SV_Target0
 	Color += weight[0].y * sceneTexture.Sample(Sampler, In.tex1.xy);
 	Color += weight[0].z * sceneTexture.Sample(Sampler, In.tex2.xy);
 	Color += weight[0].w * sceneTexture.Sample(Sampler, In.tex3.xy);
-	Color += weight[0].x * sceneTexture.Sample(Sampler, In.tex4.xy);
-	Color += weight[0].y * sceneTexture.Sample(Sampler, In.tex5.xy);
-	Color += weight[0].z * sceneTexture.Sample(Sampler, In.tex6.xy);
-	Color += weight[0].w * sceneTexture.Sample(Sampler, In.tex7.xy);
+	Color += weight[1].x * sceneTexture.Sample(Sampler, In.tex4.xy);
+	Color += weight[1].y * sceneTexture.Sample(Sampler, In.tex5.xy);
+	Color += weight[1].z * sceneTexture.Sample(Sampler, In.tex6.xy);
+	Color += weight[1].w * sceneTexture.Sample(Sampler, In.tex7.xy);
     
     // 基準テクセルからマイナス方向に8テクセル、重み付きでサンプリング
-	Color += weight[1].x * sceneTexture.Sample(Sampler, In.tex0.zw);
-	Color += weight[1].y * sceneTexture.Sample(Sampler, In.tex1.zw);
-	Color += weight[1].z * sceneTexture.Sample(Sampler, In.tex2.zw);
-	Color += weight[1].w * sceneTexture.Sample(Sampler, In.tex3.zw);
+	Color += weight[0].x * sceneTexture.Sample(Sampler, In.tex0.zw);
+	Color += weight[0].y * sceneTexture.Sample(Sampler, In.tex1.zw);
+	Color += weight[0].z * sceneTexture.Sample(Sampler, In.tex2.zw);
+	Color += weight[0].w * sceneTexture.Sample(Sampler, In.tex3.zw);
 	Color += weight[1].x * sceneTexture.Sample(Sampler, In.tex4.zw);
 	Color += weight[1].y * sceneTexture.Sample(Sampler, In.tex5.zw);
 	Color += weight[1].z * sceneTexture.Sample(Sampler, In.tex6.zw);
