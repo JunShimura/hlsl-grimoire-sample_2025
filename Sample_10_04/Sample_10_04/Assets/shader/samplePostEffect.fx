@@ -202,8 +202,7 @@ float4 PSBlur(PS_BlurInput In) : SV_Target0
     
     // 基準テクセルからプラス方向に8テクセル、重み付きでサンプリング
 	Color = weight[0].x * sceneTexture.Sample(Sampler, In.tex0.xy);
-    
-	Color += weight[0].y * sceneTexture.Sample(Sampler, In.tex1.xy);
+    Color += weight[0].y * sceneTexture.Sample(Sampler, In.tex1.xy);
 	Color += weight[0].z * sceneTexture.Sample(Sampler, In.tex2.xy);
 	Color += weight[0].w * sceneTexture.Sample(Sampler, In.tex3.xy);
 	Color += weight[1].x * sceneTexture.Sample(Sampler, In.tex4.xy);

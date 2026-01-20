@@ -57,8 +57,19 @@ float4 PSSamplingLuminance(PSInput In) : SV_Target0
 }
 
 // step-5 ボケ画像にアクセスするための変数を追加
+Texture2D<float4> g_bokeTexture_0 : register(t0); // ボケ画像のテクスチャ
+Texture2D<float4> g_bokeTexture_1 : register(t1); // ボケ画像のテクスチャ
+Texture2D<float4> g_bokeTexture_2 : register(t2); // ボケ画像のテクスチャ
+Texture2D<float4> g_bokeTexture_3 : register(t3); // ボケ画像のテクスチャ
 
 float4 PSBloomFinal(PSInput In) : SV_Target0
 {
     // step-6 ボケ画像をサンプリングして、平均をとって出力する
+	float4 combineColor = g_bokeTexture_0.Sample(Sampler, In.uv);
+	combineColor += g_bokeTexture_1.Sample(Sampler, In.uv);
+	combineColor += g_bokeTexture_2.Sample(Sampler, In.uv);
+	combineColor += g_bokeTexture_3.Sample(Sampler, In.uv);
+	combineColor *= 0.25f; // 4つの平均をとる
+	combineColor.a = 1.0f;
+	return combineColor;
 }
