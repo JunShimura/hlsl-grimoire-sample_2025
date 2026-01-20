@@ -32,6 +32,8 @@ PSInput VSMain(VSInput In)
 }
 
 //step-11 ボケ画像と深度テクスチャにアクセスするための変数を追加
+Texture2D<float4> bokeTexture : register(t0); // ボケ画像
+Texture2D<float> depthTexture : register(t1); // 深度テクスチャ
 
 sampler Sampler : register(s0);
 
@@ -42,5 +44,20 @@ sampler Sampler : register(s0);
 float4 PSMain(PSInput In) : SV_Target0
 {
     // step-12 ボケ画像書き込み用のピクセルシェーダーを実装
-
+    // カメラ空間でのZ値を取得
+	float depth = depthTexture.Sample(Sampler, In.uv);
+    
+    // カメラ空間での深度値が800以下ならピクセルキル
+    // →ボケ画像を書き込まない
+	clip(depth - 800.0f);
+    
+    // ボケ画像をサンプリングして返す
+	float4 boke = bokeTexture.Sample(Sampler, In.uv);
+    
+    // 深度値から不透明度を計算する
+    // 深度値800からボケが始まり、深度値2000で最大のボケ具合になる
+    // →つまり、深度値800以下は不透明度0、深度値2000以上は不透明度1になる
+	boke.a = min(1.0f,(depth - 800.0f )/ 2000.0f);
+    
+	return boke;
 }

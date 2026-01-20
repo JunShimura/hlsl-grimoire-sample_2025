@@ -38,9 +38,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="system\system.cpp">
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
@@ -172,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="sub.cpp">
       <Filter>ソース ファイル\sub</Filter>
+    </ClCompile>
+    <ClCompile Include="main.after.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

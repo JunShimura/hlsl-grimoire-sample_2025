@@ -35,11 +35,16 @@ struct SPSIn
     float3 worldPos : TEXCOORD1;    // ワールド空間でのピクセルの座標
 
     // step-7 カメラ空間でのZ値を記録する変数を追加
+	float3 depthInView : TEXCOORD2;
 
 };
 
 // step-8 ピクセルシェーダーからの出力構造体を定義する。
-
+struct SPSOut
+{
+    float4 color : SV_Target0;   // ピクセルの色
+    float depth : SV_Target1;     // ピクセルの深度値
+};
 
 ///////////////////////////////////////////////////
 // グローバル変数
@@ -61,7 +66,8 @@ SPSIn VSMain(SVSIn vsIn)
     psIn.pos = mul(mView, psIn.pos);
 
     //step-9 頂点シェーダーでカメラ空間でのZ値を設定する
-
+	psIn.depthInView = psIn.pos.z;
+    
     psIn.pos = mul(mProj, psIn.pos);
     psIn.normal = normalize(mul(mWorld, vsIn.normal));
     psIn.tangent = normalize(mul(mWorld, vsIn.tangent));
@@ -77,5 +83,13 @@ SPSIn VSMain(SVSIn vsIn)
 SPSOut PSMain(SPSIn psIn)
 {
     //step-10 ピクセルシェーダーからカラーとZ値を出力する。
+	SPSOut psOut;
+    
+    // カラーを計算
+	psOut.color = CalcPBR(psIn);
+    
+    // カメラ空間でのZ値を深度値として出力
+	psOut.depth = psIn.depthInView;
+	return psOut;
 
 }

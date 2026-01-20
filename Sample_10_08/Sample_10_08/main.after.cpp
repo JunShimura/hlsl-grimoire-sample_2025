@@ -39,7 +39,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     vertDiagonalBlurSpriteInitData.m_textures[0] = &mainRenderTarget.GetRenderTargetTexture();
     vertDiagonalBlurSpriteInitData.m_width = 1280;
     vertDiagonalBlurSpriteInitData.m_height = 720;
-    vertDiagonalBlurSpriteInitData.m_fxFilePath = "Assets/shader/sample.fx";
+    vertDiagonalBlurSpriteInitData.m_fxFilePath = "Assets/shader/sample.after.fx";
 
     // 垂直、対角線ブラー用のピクセルシェーダーを指定する
     vertDiagonalBlurSpriteInitData.m_psEntryPoinFunc = "PSVerticalDiagonalBlur";
@@ -55,7 +55,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     phomboidBlurSpriteInitData.m_textures[1] = &rtDiagonalBlur.GetRenderTargetTexture();
     phomboidBlurSpriteInitData.m_width = 1280;
     phomboidBlurSpriteInitData.m_height = 720;
-    phomboidBlurSpriteInitData.m_fxFilePath = "Assets/shader/sample.fx";
+    phomboidBlurSpriteInitData.m_fxFilePath = "Assets/shader/sample.after.fx";
 
     // 六角形ブラー用のピクセルシェーダーを指定する
     phomboidBlurSpriteInitData.m_psEntryPoinFunc = "PSRhomboidBlur";
