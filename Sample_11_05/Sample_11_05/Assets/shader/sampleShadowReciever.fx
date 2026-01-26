@@ -11,6 +11,11 @@ cbuffer ModelCb : register(b0)
 };
 
 // step-11 影用のパラメータにアクセスする定数バッファーを定義
+cbuffer ShadowParamCb : register(b1)
+{
+	float4x4 mLVP; // ライトビュープロジェクション行列
+	float3 lightPos; // ライトの座標
+};
 
 // 頂点シェーダーへの入力
 struct SVSIn
@@ -56,7 +61,7 @@ SPSIn VSMain(SVSIn vsIn)
     psIn.posInLVP = mul(mLVP, worldPos);
 
     // step-12 頂点のライトから見た深度値を計算する
-
+	psIn.posInLVP.z = length(worldPos.xyz - lightPos) / 1000.0f;
     return psIn;
 }
 
@@ -79,6 +84,19 @@ float4 PSMain(SPSIn psIn) : SV_Target0
         && shadowMapUV.y > 0.0f && shadowMapUV.y < 1.0f)
     {
         // step-13 シャドウレシーバーに影を落とす
+        // シャドウマップからライトから見た深度値を取得する
+		float2 shadowValue = g_shadowMap.Sample(g_sampler, shadowMapUV).xy;
+        
+        // まずこのピクセルが遮蔽されているかを判定する
+        if(zInLVP > shadowValue.r && zInLVP <= 1.0f)
+        {
+            // 遮蔽されている場合、さらに精度を上げるために2乗の深度値で再判定する
+            if((zInLVP * zInLVP) > shadowValue.y)
+            {
+                //////// ここから続き　////////
+                
+            }
+		}
 
     }
 

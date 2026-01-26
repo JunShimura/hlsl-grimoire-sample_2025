@@ -44,6 +44,7 @@ Texture2D<float4> g_shadowMap : register(t10);  // シャドウマップ
 sampler g_sampler : register(s0);               // サンプラーステート
 
 // step-1 シャドウマップサンプリング用のサンプラーステートを追加する
+SamplerComparisonState g_shadowSampler : register(s1);
 
 /// <summary>
 /// 影が落とされる3Dモデル用の頂点シェーダー
@@ -83,9 +84,19 @@ float4 PSMain(SPSIn psIn) : SV_Target0
         && shadowMapUV.y > 0.0f && shadowMapUV.y < 1.0f)
     {
         // step-2 SampleCmpLevelZero()関数を使用して、遮蔽率を取得する
-
+		float shadow = g_shadowMap.SampleCmpLevelZero(
+            g_shadowSampler, // サンプラー
+            shadowMapUV, // UV座標
+            zInLVP // 比較するZ値
+        );
+        
         // step-3 シャドウカラーと通常カラーを遮蔽率で線形補間する
-    }
+        // シャドウカラーを計算
+		float3 shadowColor = color.rgb * 0.5f;
+        
+        // 遮蔽率で線形補間
+		color.rgb = lerp(color.rgb, shadowColor, shadow);
+	}
 
     return color;
 }
