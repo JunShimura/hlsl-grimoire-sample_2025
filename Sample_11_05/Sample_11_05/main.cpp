@@ -98,7 +98,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	ModelInitData bgModelInitData;
 
 	// シャドウレシーバー（影が落とされるモデル）用のシェーダーを指定する
-	bgModelInitData.m_fxFilePath = "Assets/shader/SampleReceiveShadow.fx";
+	bgModelInitData.m_fxFilePath = "Assets/shader//sampleShadowReciever.fx";
 
 	// 【注目】影用のパラメーターを拡張定数バッファに設定する
 	bgModelInitData.m_expandConstantBuffer = (void*)&sp;
