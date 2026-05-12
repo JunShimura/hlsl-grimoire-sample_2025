@@ -26,6 +26,7 @@ struct SPSIn
     float2 uv : TEXCOORD0;
 
     // step-5 頂点シェーダーからの出力にワールド座標を追加
+    float3 worldPos : TEXCOORD1;
 
 };
 
@@ -36,6 +37,7 @@ struct SPSOut
     float3 normal : SV_Target1; // 法線
 
     // step-6 ピクセルシェーダーからの出力にワールド座標を追加
+    float3 worldPos : SV_Target2;
 
 };
 
@@ -55,6 +57,7 @@ SPSIn VSMain(SVSIn vsIn, uniform bool hasSkin)
     psIn.pos = mul(mWorld, vsIn.pos);   // モデルの頂点をワールド座標系に変換
 
     // step-7 頂点シェーダーからワールド座標を出力
+    psIn.worldPos = psIn.pos;
 
     psIn.pos = mul(mView, psIn.pos);    // ワールド座標系からカメラ座標系に変換
     psIn.pos = mul(mProj, psIn.pos);    // カメラ座標系からスクリーン座標系に変換
@@ -83,6 +86,7 @@ SPSOut PSMain(SPSIn psIn)
     psOut.normal = (psIn.normal / 2.0f) + 0.5f;
 
     // step-8 ピクセルシェーダーからワールド座標を出力
-
+    psOut.worldPos = psIn.worldPos;
+    
     return psOut;
 }

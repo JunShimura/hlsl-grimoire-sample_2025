@@ -48,7 +48,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     // モデルを初期化するための情報を構築する
     ModelInitData modelInitData;
     // modelInitData.m_tkmFilePath = "Assets/modelData/teapot.tkm";
-    modelInitData.m_tkmFilePath = "Assets/modelData/TexDice.tkm";
+    modelInitData.m_tkmFilePath = "Assets/modelData/TeaPot.tkm";
 
     // 使用するシェーダーファイルパスを設定する
     modelInitData.m_fxFilePath = "Assets/shader/sample.fx";

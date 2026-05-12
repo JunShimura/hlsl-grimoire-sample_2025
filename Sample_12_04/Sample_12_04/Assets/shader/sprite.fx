@@ -67,8 +67,10 @@ float4 PSMain(PSInput In) : SV_Target0
     float3 specColor = ligColor * t * 50.0f;
 
     // step-3 スペキュラ強度を法線テクスチャのw要素からサンプリングする
+    float specPower = normalTexture.Sample(Sampler, In.uv).w;
 
     // step-4 スペキュラ強度をスペキュラライトに乗算する
+    specColor *= specPower;
 
     //反射光にスペキュラカラーを足し算する
     lig += specColor;

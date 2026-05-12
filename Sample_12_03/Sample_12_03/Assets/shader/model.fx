@@ -18,7 +18,8 @@ struct SVSIn
     float2 uv : TEXCOORD0;
 
     // step-1 頂点シェーダーの入力に接ベクトルと従ベクトルを追加
-
+    float3 tangent : TANGENT;
+    float3 biNormal : BINORMAL;
 };
 
 // ピクセルシェーダーへの入力
@@ -30,6 +31,8 @@ struct SPSIn
     float3 worldPos : TEXCOORD1; // ワールド座標
 
     // step-2 ピクセルシェーダーの入力に接ベクトルと従ベクトルを追加
+    float3 tangent : TANGENT;
+    float3 biNormal : BINORMAL;
 
 };
 
@@ -45,6 +48,7 @@ struct SPSOut
 Texture2D<float4> g_texture : register(t0);
 
 // step-3 法線マップにアクセスするための変数を追加
+Texture2D<float4> g_normalMap : register(t1);
 
 // サンプラーステート
 sampler g_sampler : register(s0);
@@ -65,7 +69,9 @@ SPSIn VSMain(SVSIn vsIn, uniform bool hasSkin)
     psIn.normal = normalize(mul(mWorld, vsIn.normal));
 
     // step-4 接ベクトルと従ベクトルをワールド空間に変換する
-
+    psIn.tangent = normalize(mul(mWorld, vsIn.tangent));
+    psIn.biNormal = normalize(mul(mWorld, vsIn.biNormal));
+    
     psIn.uv = vsIn.uv;
 
     return psIn;
@@ -83,9 +89,16 @@ SPSOut PSMain(SPSIn psIn)
     psOut.albedo = g_texture.Sample(g_sampler, psIn.uv);
 
     // step-5 法線マップからタンジェントスペースの法線をサンプリングする
-
-
+    float3 localNormal = g_normalMap.Sample(g_sampler, psIn.uv).xyz;
+    
+    // タンジェントスペースの法線を0～1の範囲から-1～1の範囲に復元する
+    localNormal = (localNormal - 0.5f) * 2.0f;
+    
     // step-6 タンジェントスペースの法線をワールドスペースに変換する
+    float3 normal = localNormal.x * psIn.tangent
+        + localNormal.y * psIn.biNormal
+        + localNormal.z * psIn.normal;
+    // normal = normalize(psIn.normal);
 
     // 法線を出力
     // 出力は0～1に丸められてしまうのでマイナスの値が失われてしまう

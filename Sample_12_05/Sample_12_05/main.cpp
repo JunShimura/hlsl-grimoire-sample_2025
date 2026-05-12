@@ -57,6 +57,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     Model model;
     model.Init(modelInitData);
 
+    // 2つ目のモデルを初期化（複数モデルでの検証用）
+    Model model2;
+    model2.Init(modelInitData);
+    model2.UpdateWorldMatrix(
+        { 0.0f, 0.0f, 100.0f },  // 位置をずらす
+        g_quatIdentity,
+        g_vec3One
+    );
+
     // G-Bufferを作成
     RenderTarget albedRT;   // アルベドカラー書き込み用のレンダリングターゲット
     albedRT.Create(
@@ -149,7 +158,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
         // レンダリングターゲットをクリア
         renderContext.ClearRenderTargetViews(ARRAYSIZE(rts), rts);
+
+        // 複数のモデルを描画してG-Bufferを構築
         model.Draw(renderContext);
+        model2.Draw(renderContext);  // 2つ目のモデルも描画
 
         // レンダリングターゲットへの書き込み待ち
         renderContext.WaitUntilFinishDrawingToRenderTargets(ARRAYSIZE(rts), rts);
