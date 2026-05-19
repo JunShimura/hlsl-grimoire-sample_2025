@@ -60,12 +60,35 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     bgModel.Init(modelInitData);
 
     // step-1 半透明の球体モデルを初期化
+    ModelInitData transModeInitData;
+    transModeInitData.m_tkmFilePath = "Assets/modelData/sphere.tkm";
+	transModeInitData.m_fxFilePath = "Assets/shader/model.fx";
+
+    // 半透明モデルはモデルを描くときにライティングを行うので、ライト情報を渡す
+    transModeInitData.m_expandConstantBuffer = &light;
+	transModeInitData.m_expandConstantBufferSize = sizeof(light);
+
+    // ピクセルシェーダーのエントリーポイントが不透明モデルとは異なる
+    // 不透明モデルはPSMain、半透明モデルはPSMainTransを使用する
+    // ピクセルシェーダーの実装はあとで確認
+	transModeInitData.m_psEntryPointFunc = "PSMainTrans";
+
+	// 半透明の球体モデルを初期化
+	Model sphereModel;
+	sphereModel.Init(transModeInitData);
 
     Vector3 planePos = { 0.0f, 160.0f, 20.0f };
 
     // G-Bufferを作成
     RenderTarget albedRT; // アルベドカラー書き込み用のレンダリングターゲット
-    albedRT.Create(FRAME_BUFFER_W, FRAME_BUFFER_H, 1, 1, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT);
+    albedRT.Create(
+        FRAME_BUFFER_W,
+        FRAME_BUFFER_H,
+        1,
+        1,
+        DXGI_FORMAT_R8G8B8A8_UNORM,
+        DXGI_FORMAT_D32_FLOAT
+    );
     RenderTarget normalRT; // 法線書き込み用のレンダリングターゲット
     normalRT.Create(
         FRAME_BUFFER_W,
@@ -75,7 +98,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         DXGI_FORMAT_R32G32B32A32_FLOAT,
         DXGI_FORMAT_UNKNOWN
     );
-    RenderTarget worldPosRT;
+	RenderTarget worldPosRT;    // ワールド座標書き込み用のレンダリングターゲット
     worldPosRT.Create(
         FRAME_BUFFER_W,
         FRAME_BUFFER_H,
@@ -161,6 +184,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         defferdLightinSpr.Draw(renderContext);
 
         // step-2 深度ステンシルビューをG-Bufferを作成したときのものに変更する
+		// 深度ステンシルビューをG-Bufferを作成したときのものに変更する
+        renderContext.SetRenderTarget(
+            g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
+            rts[0]->GetDSVCpuDescriptorHandle()
+        );
+
+        // 半透過オブジェクトを描画
+		sphereModel.Draw(renderContext);
 
         /////////////////////////////////////////
         // 絵を描くコードを書くのはここまで！！！
