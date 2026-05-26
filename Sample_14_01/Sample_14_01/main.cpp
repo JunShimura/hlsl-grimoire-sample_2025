@@ -49,32 +49,42 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// シャドウキャスターフラグをONにする
 	teapotModelRender.SetShadowCasterFlag(true);
 
-    // teapotModelRender.UpdateWorldMatrix({ 0.0f, 50.0f, 0.0f }, g_quatIdentity, g_vec3One);
-    Quaternion rotY = g_quatIdentity;
-    rotY.AddRotationY(2.0f);
-	teapotModelRender.UpdateWorldMatrix({ 0.0f, 50.0f, 0.0f }, rotY, g_vec3One);
+	// ティーポットの回転角度を初期化（ラジアン）
+	float teapotRotationAngle = 0.0f;
 
-    //////////////////////////////////////
-    // 初期化を行うコードを書くのはここまで！！！
-    //////////////////////////////////////
-    auto& renderContext = g_graphicsEngine->GetRenderContext();
+	//////////////////////////////////////
+	// 初期化を行うコードを書くのはここまで！！！
+	//////////////////////////////////////
+	auto& renderContext = g_graphicsEngine->GetRenderContext();
 
-    // ここからゲームループ
-    while (DispatchWindowMessage())
-    {
-        // レンダリング開始
-        g_engine->BeginFrame();
-        g_camera3D->MoveForward(g_pad[0]->GetLStickYF());
-        g_camera3D->MoveRight(g_pad[0]->GetLStickXF());
-        g_camera3D->MoveUp(g_pad[0]->GetRStickYF());
+	// ここからゲームループ
+	while (DispatchWindowMessage())
+	{
+		// レンダリング開始
+		g_engine->BeginFrame();
+		g_camera3D->MoveForward(g_pad[0]->GetLStickYF());
+		g_camera3D->MoveRight(g_pad[0]->GetLStickXF());
+		g_camera3D->MoveUp(g_pad[0]->GetRStickYF());
 
-        //////////////////////////////////////
-        // ここから絵を描くコードを記述する
-        //////////////////////////////////////
+		//////////////////////////////////////
+		// ここから絵を描くコードを記述する
+		//////////////////////////////////////
 
-        bgModelRender.Draw();
+		bgModelRender.Draw();
 
-        // step-2 ティーポットを描画する
+		// step-2 ティーポットを描画する
+		// 毎秒0.25回転（4秒で1回転）させる
+		// 60FPS想定: 1フレームあたり π/120 ラジアン回転
+		// 計算式: (2π × 0.25回転/秒) / 60フレーム/秒 = π/120 ラジアン/フレーム
+		teapotRotationAngle += Math::PI / 120.0f;
+
+		// 回転クォータニオンを作成
+		Quaternion rotY;
+		rotY.SetRotationY(teapotRotationAngle);
+
+		// ティーポットのワールド行列を更新
+		teapotModelRender.UpdateWorldMatrix({ 0.0f, 50.0f, 0.0f }, rotY, g_vec3One);
+
 		teapotModelRender.Draw();
 
         //レンダリングエンジンを実行

@@ -281,6 +281,8 @@
   <ItemGroup>
     <None Include="ModelRender詳細解説_Main.cppとの関連.md" />
     <None Include="RenderingEngine_Execute関数詳細解説.md" />
+    <None Include="Teapot回転実装手順書_シャドウマップ対応版.md" />
+    <None Include="シャドウマップで同じ物体が複数のモデルを持つ理由.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
