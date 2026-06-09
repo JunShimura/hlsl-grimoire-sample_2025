@@ -15,6 +15,7 @@ struct SPSIn
 	float2 uv : TEXCOORD0;
 	float4 posInProj : TEXCOORD1;
 	float sinTheta : TEXCOORD2;  // Y軸回転のsin(θ)
+	float4 debugMatrix : TEXCOORD3;  // デバッグ用行列要素
 };
 
 ///////////////////////////////////////////
@@ -26,13 +27,6 @@ cbuffer ModelCb : register(b0)
 	float4x4 mWorld;
 	float4x4 mView;
 	float4x4 mProj;
-};
-
-// 拡張定数バッファー
-cbuffer ExpandCb : register(b1)
-{
-	float g_alpha;  // アルファ値（0.0～1.0）
-	float3 g_padding;  // パディング（16バイトアライメント）
 };
 
 
@@ -126,9 +120,6 @@ float4 PSMain(SPSIn psIn) : SV_Target0
 
 	// 75%:25%の比率で合成
 	float4 finalColor = sceneColor * 0.75f + albedoColor * 0.25f;
-
-	// アルファ値を適用（拡張定数バッファから取得）
-	finalColor.a = g_alpha;
 
 	// 合成したカラーを返す
 	return finalColor;

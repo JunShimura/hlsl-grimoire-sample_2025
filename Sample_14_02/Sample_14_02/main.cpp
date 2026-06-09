@@ -37,6 +37,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     //【注目】メインレンダリングターゲットのスナップショットテクスチャを拡張SRVに指定する
     modelInitData.m_expandShaderResoruceView[0] = &renderingEngine.GetMainRenderTargetSnapshotDrawnOpacity();
+
+    // 拡張定数バッファ用の構造体（16バイトアライメント）
+    struct AlphaParam
+    {
+        float alpha;
+        float padding[3];
+    };
+    AlphaParam alphaParam;
+    alphaParam.alpha = 1.0f;  // 初期値
+
+    // 拡張定数バッファを設定
+    modelInitData.m_expandConstantBuffer = &alphaParam;
+    modelInitData.m_expandConstantBufferSize = sizeof(AlphaParam);
+
     myRenderer::ModelRender teapotModelRender;
 
     //フォワードレンダリングの描画パスで実行されるように初期化する
@@ -45,6 +59,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     // ティーポットの回転角度を初期化（ラジアン）
     float teapotRotationAngle = 0.0f;
+
+    // 透明度アニメーション用の変数
+    float alphaTimer = 0.0f;  // 経過時間（秒）
+    const float alphaCycleDuration = 10.0f;  // 1サイクル10秒（5秒で透明→不透明、5秒で不透明→透明）
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
@@ -78,6 +96,30 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
         // ティーポットのワールド行列を更新
         teapotModelRender.UpdateWorldMatrix({ 0.0f, 20.0f, 0.0f }, rotY, g_vec3One);
+
+        // 透明度アニメーション（10秒周期）
+        alphaTimer += 1.0f / 60.0f;  // 60FPS想定で時間を進める
+        if (alphaTimer >= alphaCycleDuration)
+        {
+            alphaTimer = 0.0f;
+        }
+
+        // 0～5秒: 透明(0.0)→不透明(1.0)
+        // 5～10秒: 不透明(1.0)→透明(0.0)
+        float alpha;
+        if (alphaTimer < alphaCycleDuration / 2.0f)
+        {
+            // 0～5秒: 0.0 → 1.0
+            alpha = alphaTimer / (alphaCycleDuration / 2.0f);
+        }
+        else
+        {
+            // 5～10秒: 1.0 → 0.0
+            alpha = 1.0f - (alphaTimer - alphaCycleDuration / 2.0f) / (alphaCycleDuration / 2.0f);
+        }
+
+        // 拡張定数バッファのアルファ値を更新
+        alphaParam.alpha = alpha;
 
         teapotModelRender.Draw();
 
