@@ -65,6 +65,14 @@ namespace myRenderer
             {
                 m_forwardRenderModel.UpdateWorldMatrix(pos, rot, scale);
             }
+            // シャドウマップ用のモデルも更新
+            for (int ligNo = 0; ligNo < NUM_DEFERRED_LIGHTING_DIRECTIONAL_LIGHT; ligNo++)
+            {
+                for (int areaNo = 0; areaNo < NUM_SHADOW_MAP; areaNo++)
+                {
+                    m_shadowModels[ligNo][areaNo].UpdateWorldMatrix(pos, rot, scale);
+                }
+            }
         }
 
         /// <summary>

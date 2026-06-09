@@ -10,7 +10,7 @@ void InitRootSignature(RootSignature& rs);
 // ウィンドウプログラムのメイン関数
 ///////////////////////////////////////////////////////////////////
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    LPWSTR lpCmdLine, int nCmdShow)
+    LPWSTR lpCmdLine, int nCmdShow)
 {
     // ゲームの初期化
     InitGame(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("Game"));
@@ -18,7 +18,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     //////////////////////////////////////
     // ここから初期化を行うコードを記述する
     //////////////////////////////////////
-
     // ルートシグネチャを作成
     RootSignature rootSignature;
     InitRootSignature(rootSignature);
@@ -32,8 +31,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     bgModelRender.InitDeferredRendering(renderingEngine, "Assets/modelData/bg/bg.tkm", true);
 
     // step-1 ティーポットモデルの描画処理を初期化
+    myRenderer::ModelInitDataFR modelInitData;
+    modelInitData.m_tkmFilePath = "Assets/modelData/teapot.tkm";
+    modelInitData.m_fxFilePath = "Assets/shader/sample.fx";
 
-    teapotModelRender.UpdateWorldMatrix({ 0.0f, 20.0f, 0.0f }, g_quatIdentity, g_vec3One);
+    //【注目】メインレンダリングターゲットのスナップショットテクスチャを拡張SRVに指定する
+    modelInitData.m_expandShaderResoruceView[0] = &renderingEngine.GetMainRenderTargetSnapshotDrawnOpacity();
+    myRenderer::ModelRender teapotModelRender;
+
+    //フォワードレンダリングの描画パスで実行されるように初期化する
+    teapotModelRender.InitForwardRendering(renderingEngine, modelInitData);
+    teapotModelRender.SetShadowCasterFlag(true);
+
+    // ティーポットの回転角度を初期化（ラジアン）
+    float teapotRotationAngle = 0.0f;
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
@@ -56,8 +67,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         bgModelRender.Draw();
 
         // step-2 ティーポットモデルを描画
+        // 毎秒0.25回転（4秒で1回転）させる
+        // 60FPS想定: 1フレームあたり π/120 ラジアン回転
+        // 計算式: (2π × 0.25回転/秒) / 60フレーム/秒 = π/120 ラジアン/フレーム
+        teapotRotationAngle += Math::PI / 120.0f;
 
-        //レンダリングパイプラインを実行
+        // 回転クォータニオンを作成
+        Quaternion rotY;
+        rotY.SetRotationY(teapotRotationAngle);
+
+        // ティーポットのワールド行列を更新
+        teapotModelRender.UpdateWorldMatrix({ 0.0f, 20.0f, 0.0f }, rotY, g_vec3One);
+
+        teapotModelRender.Draw();
+
+        // レンダリングパイプラインを実行
         renderingEngine.Execute(renderContext);
 
         /////////////////////////////////////////
@@ -74,7 +98,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 void InitRootSignature(RootSignature& rs)
 {
     rs.Init(D3D12_FILTER_MIN_MAG_MIP_LINEAR,
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP);
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP);
 }
