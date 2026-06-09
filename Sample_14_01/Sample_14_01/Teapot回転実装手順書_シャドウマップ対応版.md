@@ -419,16 +419,11 @@ void RenderingEngine::RenderToShadowMap(RenderContext& rc)
 
 ## 6. トラブルシューティング
 
-### 問題1: ビルドエラー「'g_gameTime' は定義されていません」
+### 問題1: 固定したFPSでの制御が成立している確証がない
 
-**エラーメッセージ**:
-```
-error C2065: 'g_gameTime': 定義されていない識別子です。
-```
 
 **原因**:
-- このエンジンには `g_gameTime` クラスが存在しない
-- `GetFrameDeltaTime()` メソッドも存在しない
+- このエンジンには 時間計測が存在しない
 
 **解決策**:
 - フレームレート非依存の実装を諦め、60FPS固定を前提とする

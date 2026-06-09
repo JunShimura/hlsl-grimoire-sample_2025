@@ -116,7 +116,7 @@ float4 PSMain(SPSIn psIn) : SV_Target0
 	float2 uv = psIn.posInProj.xy * float2(0.5f, -0.5f) + 0.5f;
 
 	// シンプレックスノイズを利用して、UVオフセットを計算する（回転角度に応じて変化）
-	float uOffset = SimplexNoise(float3(uv, 0.0f) * 256.0f) * noiseAmount;
+    float uOffset = SimplexNoise(float3(uv, noiseAmount) * 256.0f) * noiseAmount;
 
 	// シーンテクスチャからカラーをサンプリング（75%）
 	float4 sceneColor = g_sceneTexture.Sample(g_sampler, uv + uOffset);
