@@ -362,4 +362,7 @@
       <Filter>MiniEngine</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\shader\行列変換の数式.md" />
+  </ItemGroup>
 </Project>
