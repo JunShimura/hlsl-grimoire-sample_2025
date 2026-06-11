@@ -106,8 +106,9 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     // tの値は0～1の値をとる。tが0ならどのピクセルもクリップされない
     // tの値が1になると、64以下のピクセルがクリップされるため、
     // すべてのピクセルがキリップされる（ditherの値の最大値は62なので）
-	clip(dither - 64 * clipRate);
+	// clip(dither - 64 * clipRate);
 
 	float4 tex = g_texture.Sample(g_sampler, psIn.uv);
+    tex.a = 1.0f - clipRate;
 	return tex;
 }
