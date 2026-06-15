@@ -364,5 +364,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\shader\行列変換の数式.md" />
+    <None Include="Assets\shader\HLSL行列格納順序のエビデンス.md" />
   </ItemGroup>
 </Project>
