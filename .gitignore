@@ -335,3 +335,5 @@ ASALocalRun/
 !Assets/**/
 !Assets/**/*.obj
 !Assets/*.obj
+/Sample_14_04/Sample_14_04/Assets/shader/指摘への対応完了報告.md
+/Sample_14_04/Sample_14_04/Assets/shader/指摘の検証結果.md
