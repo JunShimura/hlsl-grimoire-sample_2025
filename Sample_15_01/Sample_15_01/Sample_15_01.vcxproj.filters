@@ -314,4 +314,7 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="main_explanation.md" />
+  </ItemGroup>
 </Project>
