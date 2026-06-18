@@ -2,6 +2,7 @@
 #include "system/system.h"
 #include "sub.h"
 
+
 struct OutputData
 {
     float averageScore; // 平均点
@@ -9,10 +10,13 @@ struct OutputData
     float minScore;     // 最小得点
 
     // step-3 出力構造体にメンバーを追加する
+    int totalScore;     // 合計点
+	float stdDev;	  // 標準偏差
+
 };
 
 ///////////////////////////////////////////////////////////////////
-//  ウィンドウプログラムのメイン関数
+// ウィンドウプログラムのメイン関数
 ///////////////////////////////////////////////////////////////////
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -22,7 +26,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //////////////////////////////////////
     // ここから初期化を行うコードを記述する
     //////////////////////////////////////
-    // コンピュートシェーダーのロード
+
+    // コンピュートシェーダのロード
     Shader cs;
     cs.LoadCS("Assets/shader/sample.fx", "CSMain");
 
@@ -49,13 +54,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     ds.RegistShaderResource(0, inputSB);
     ds.RegistUnorderAccessResource(0, outputSb);
     ds.Commit();
-
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
     //////////////////////////////////////
     auto& renderContext = g_graphicsEngine->GetRenderContext();
 
-    //  ここからゲームループ
+    // ここからゲームループ
     while (DispatchWindowMessage())
     {
         // フレーム開始
@@ -78,31 +82,34 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         renderContext.SetComputeDescriptorHeap(ds);
         renderContext.Dispatch(1, 1, 1);
 
-        // レンダリング終了
+        // フレーム終了
         g_engine->EndFrame();
 
         // 平均点、最高得点、最低得点を表示する
         char text[256];
         OutputData* outputData = (OutputData*)outputSb.GetResourceOnCPU();
-
         // step-4 合計点を表示する
         sprintf(
             text,
-            "1人目 = %d\n" \
-            "2人目 = %d\n" \
-            "3人目 = %d\n" \
+            "１人目 = %d\n" \
+            "２人目 = %d\n" \
+            "３人目 = %d\n" \
             "平均点 = %0.2f\n" \
             "最高得点=%0.2f\n" \
-            "最低得点=%0.2f\n",
+            "最低得点=%0.2f\n" \
+            "合計点=%d\n" \
+            "標準偏差=%0.2f\n", // これを追加
             inputData[0],
             inputData[1],
             inputData[2],
             outputData->averageScore,
             outputData->maxScore,
-            outputData->minScore
+            outputData->minScore,
+            outputData->totalScore, // これも追加
+            outputData->stdDev // これも追加
         );
-
         MessageBoxA(nullptr, text, "成績発表", MB_OK);
     }
     return 0;
 }
+
