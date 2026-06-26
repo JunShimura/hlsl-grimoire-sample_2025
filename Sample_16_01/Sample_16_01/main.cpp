@@ -8,8 +8,17 @@ void InitRootSignature(RootSignature& rs);
 void InitStandardIOConsole();
 
 // step-1 ポイントライト構造体を定義する
+// ポイントライト構造体
+struct SPointLight
+{
+	Vector3 positoin;   // ポイントライトの位置
+	float pad0;         // パディング
+	Vector3 color;      // ポイントライトの色
+	float range;        // ポイントライトの有効範囲
+};
 
 // step-2 ポイントライトの数を表す定数を定義する
+const int NUM_POINT_LIGHT = 1000;
 
 ///////////////////////////////////////////////////////////////////
 // ウィンドウプログラムのメイン関数
@@ -35,8 +44,41 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     InitRootSignature(rootSignature);
 
     // step-3 ポイントライトをランダムな位置とカラーで初期化する
+	SPointLight pointLights[NUM_POINT_LIGHT];
+	for (auto& pt : pointLights)
+	{
+        pt.positoin.x = static_cast<float>(random() % 1000) - 500.0f;
+		pt.positoin.y = 20.0f;
+        pt.positoin.z = static_cast<float>(random() % 1000) - 500.0f;
+		pt.range = 50.0f;
+		pt.color.x = static_cast<float>(random() % 255) / 255.0f;
+		pt.color.y = static_cast<float>(random() % 255) / 255.0f;
+		pt.color.z = static_cast<float>(random() % 255) / 255.0f;
+	}
 
     // step-4 表示するモデルを初期化する
+    // ティーポットモデルを初期化
+	ModelInitData teapotModelInitData;
+
+    // ユーザー拡張データとしてポイントライトのリストを渡す
+	teapotModelInitData.m_expandConstantBuffer = pointLights;
+	teapotModelInitData.m_expandConstantBufferSize = sizeof(pointLights);
+	teapotModelInitData.m_tkmFilePath = "Assets/modelData/teapot.tkm";
+	teapotModelInitData.m_fxFilePath = "Assets/shader/model.fx";
+	Model teapotModel;
+	teapotModel.Init(teapotModelInitData);
+
+    // 背景のモデルを初期化
+	ModelInitData bgModelInitData;
+
+	// ユーザー拡張データとしてポイントライトのリストを渡す
+	bgModelInitData.m_expandConstantBuffer = pointLights;
+	bgModelInitData.m_expandConstantBufferSize = sizeof(pointLights);
+	bgModelInitData.m_tkmFilePath = "Assets/modelData/bg.tkm";
+	bgModelInitData.m_fxFilePath = "Assets/shader/model.fx";
+	Model bgModel;
+	bgModel.Init(bgModelInitData);
+
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
@@ -58,8 +100,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //////////////////////////////////////
 
         // step-5 ポイントライトを毎フレーム回す
+        // ライトを回す
+        Quaternion qRot;
+		qRot.SetRotationDegY(1.0f);
+		for (auto& pt : pointLights)
+		{
+			qRot.Apply( pt.positoin);
+		}
 
         // step-6 モデルのドローコールを実行する
+		teapotModel.Draw(renderContext);
+		bgModel.Draw(renderContext);
 
         /////////////////////////////////////////
         //絵を描くコードを書くのはここまで！！！

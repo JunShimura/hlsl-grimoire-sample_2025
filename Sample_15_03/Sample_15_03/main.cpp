@@ -195,7 +195,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
         // step-9 画像を取得し、保存する
         imagebmp.Copy(finalImageRWSB.GetResourceOnCPU()); 
-        imagebmp.Save("Assets/image/blur.bmp");
+        imagebmp.Save("Assets/image/blur20260625.bmp");
 
         MessageBox(nullptr, L"完成", L"通知", MB_OK);
         // デストロイ
