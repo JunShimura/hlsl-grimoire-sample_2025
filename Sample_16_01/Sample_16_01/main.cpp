@@ -20,11 +20,13 @@ struct SPointLight
 // step-2 ポイントライトの数を表す定数を定義する
 const int NUM_POINT_LIGHT = 1000;
 
+
 ///////////////////////////////////////////////////////////////////
 // ウィンドウプログラムのメイン関数
 ///////////////////////////////////////////////////////////////////
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
+
     // ゲームの初期化
     InitGame(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("Game"));
 
