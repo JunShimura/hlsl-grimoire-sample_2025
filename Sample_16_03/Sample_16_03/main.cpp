@@ -108,14 +108,61 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     InitGBuffers(albedoRT, normalRT, depthRT);
 
     // step-1 ライトカリング用のコンピュートシェーダーをロード
+    Shader csLightCulling;
+	csLightCulling.LoadCS("Assets/shader/lightCulling.fx", "CSMain");
 
     // step-2 ライトカリング用のパイプラインステートを初期化
+	PipelineState lightCullingPipelineState;
+	InitPipelineState(rootSignature, lightCullingPipelineState, csLightCulling);
 
     // step-3 タイルごとのポイントライトの番号のリストを出力するUAVを初期化
+	RWStructuredBuffer pointLightNoListInTileUAV;
+    // 第1引数は1要素のサイズ
+    // 1要素はポイントライトの番号なので4バイト
+    // 第2引数はバッファー全体のサイズ
+    // 1つのタイルにすべてのポイントライトが含まれる可能性があるので、
+    // 1つのタイルで番号を記憶できることが可能なサイズを確保する
+    pointLightNoListInTileUAV.Init(
+        sizeof(int),
+        MAX_POINT_LIGHT * NUM_TILE,
+        nullptr
+    );
 
     // step-4 ポイントライトの情報を送るための定数バッファを作成
+	// ライトカリング用の定数バッファを作成
+	LightCullingCameraData lightCullingCameraData;
+	lightCullingCameraData.mProj = g_camera3D->GetProjectionMatrix();
+	lightCullingCameraData.mProjInv.Inverse(g_camera3D->GetProjectionMatrix());
+    lightCullingCameraData.mCameraRot = g_camera3D->GetCameraRotation(); 
+    lightCullingCameraData.screenParam.x = g_camera3D->GetNear(); 
+    lightCullingCameraData.screenParam.y = g_camera3D->GetFar(); 
+    lightCullingCameraData.screenParam.z = FRAME_BUFFER_W; 
+    lightCullingCameraData.screenParam.w = FRAME_BUFFER_H; 
+    ConstantBuffer cameraParamCB; 
+    cameraParamCB.Init(sizeof(lightCullingCameraData), &lightCullingCameraData);
+
+    // ライトカリングのライト用の定数バッファーを作成
+    ConstantBuffer lightCB; 
+    lightCB.Init(sizeof(light), &light);
 
     // step-5 ライトカリング用のディスクリプタヒープを作成
+	DescriptorHeap lightCullingDescriptorHeap;
+    lightCullingDescriptorHeap.RegistShaderResource(0, depthRT.GetRenderTargetTexture());
+    lightCullingDescriptorHeap.RegistUnorderAccessResource(0, pointLightNoListInTileUAV);
+    lightCullingDescriptorHeap.RegistConstantBuffer(0, cameraParamCB);
+    lightCullingDescriptorHeap.RegistConstantBuffer(1, lightCB);
+    lightCullingDescriptorHeap.Commit();
+
+    // ポストエフェクト的にディファードライティングを行うためのスプライトを初期化
+    Sprite defferdLightingSpr;
+    InitDefferedLightingSprite(
+        defferdLightingSpr,    
+        gbuffers,    
+        ARRAYSIZE(gbuffers),    
+        light,    
+        pointLightNoListInTileUAV 
+    );
+
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
@@ -151,6 +198,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         RenderGBuffer(renderContext, gbuffers, ARRAYSIZE(gbuffers), teapotModel, bgModel);
 
         // step-6 ライトカリングのコンピュートシェーダーをディスパッチ
+        renderContext.SetComputeRootSignature(rootSignature);
+        lightCB.CopyToVRAM(light); 
+        renderContext.SetComputeDescriptorHeap(lightCullingDescriptorHeap); 
+        renderContext.SetPipelineState(lightCullingPipelineState);
+        // グループの数はタイルの数
+        renderContext.Dispatch(    
+            FRAME_BUFFER_W / TILE_WIDTH,    
+            FRAME_BUFFER_H / TILE_HEIGHT,    
+            1);
+
 
         // リソースバリア
         renderContext.TransitionResourceState(
@@ -251,7 +308,7 @@ void InitLight(Light& light)
     light.directionLights[3].color.Set(0.0f, 0.0f, 0.5f);
 
     // ポイントライトを初期化
-    light.numPointLight = 1000;
+    light.numPointLight = MAX_POINT_LIGHT;
     Matrix mView = g_camera3D->GetViewMatrix();
     for (int i = 0; i < light.numPointLight; i++)
     {

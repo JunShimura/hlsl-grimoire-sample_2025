@@ -33,7 +33,7 @@ struct SPSOut
     float4 normal : SV_Target1; // 法線
 
     // step-4 RenderGBufferパスのピクセルシェーダーの出力に深度値を追加する
-
+    float depth : SV_Target2; // 深度値
 };
 
 // モデルテクスチャ
@@ -75,6 +75,7 @@ SPSOut PSMain(SPSIn psIn)
     psOut.normal.w = 1.0f;
 
     // step-5 射影空間でのZ値を出力する
+    psOut.depth = psIn.pos.z;
 
     return psOut;
 }

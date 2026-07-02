@@ -8,11 +8,12 @@ void InitRootSignature(RootSignature& rs);
 void InitStandardIOConsole();
 
 // ディレクションライト構造体
-struct alignas(16) DirectionalLight
+struct alignas(16)  DirectionalLight
 {
     Vector3  color;     // ライトのカラー
     float pad0;
     Vector3  direction; // ライトの方向
+    float pad1;
 };
 
 // ポイントライト構造体
@@ -24,7 +25,7 @@ struct alignas(16) PointLight
     float range;        // ライトの影響を与える範囲
 };
 
-const int NUM_POINT_LIGHT = 1000;   // ポイントライトの数
+const int NUM_POINT_LIGHT = 2000;   // ポイントライトの数
 const int NUM_DIRECTION_LIGHT = 4;  // ディレクションライトの数
 
 // ライト構造体
@@ -131,13 +132,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         DXGI_FORMAT_UNKNOWN);
 
     // step-1 射影空間でのZ値を出力するためのG-Bufferを作成
+    RenderTarget depthRT;
+    depthRT.Create(
+        FRAME_BUFFER_W,
+        FRAME_BUFFER_H,
+        1,
+        1,
+        DXGI_FORMAT_R32_FLOAT,
+        DXGI_FORMAT_UNKNOWN);
 
     RenderTarget* gbuffers[] = {
         &albedoRT,      // 0番目のレンダリングターゲット
         &normalRT,      // 1番目のレンダリングターゲット
 
         // step-2 RenderGBufferのパスのレンダリングターゲットにdepthRTを追加
-
+		& depthRT,       // 2番目のレンダリングターゲット
     };
 
     // ポストエフェクト的にディファードライティングを行うためのスプライトを初期化
@@ -152,6 +161,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     spriteInitData.m_textures[1] = &normalRT.GetRenderTargetTexture();
 
     // step-3 ディファードライティングで使用するテクスチャを追加
+	spriteInitData.m_textures[2] = &depthRT.GetRenderTargetTexture();
 
     spriteInitData.m_fxFilePath = "Assets/shader/defferedLighting.fx";
     spriteInitData.m_expandConstantBuffer = &light;

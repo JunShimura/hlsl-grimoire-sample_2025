@@ -117,21 +117,86 @@ void CSMain(
     uint3 groupThreadId    : SV_GroupThreadID)
 {
     // step-7 タイル内でのインデックスを求める
+    // groupThreadIdはグループ内でのスレッド番号
+    // これを使って、グループ内でのスレッド番号を計算する
+    uint groupIndex = groupThreadId.y * TILE_WIDTH + groupThreadId.x;
 
     // step-8 共有メモリを初期化する
+    if (groupIndex == 0)
+    {
+        sTileNumLights = 0;
+        sMinZ = 0x7F7FFFFF; // floatの最大値
+        sMaxZ = 0;
+    }
 
     // step-9 このスレッドが担当するピクセルのカメラ空間での座標を計算する
+    uint2 frameUV = dispatchThreadId.xy;
+    
+    // ここでComputePositionInCamera関数を呼び出して、カメラ空間での座標を計算する
+    float3 posInView = ComputePositionInCamera(frameUV);
 
     // step-10 全てのスレッドがここに到達するまで同期を取る
-
+    GroupMemoryBarrierWithGroupSync();
+    
     // step-11 タイルの最大・最小深度を求める
+    // この処理は並列するスレッドすべてで排他的に処理される
+    InterlockedMin(sMinZ, asuint(posInView.z));
+    InterlockedMax(sMaxZ, asuint(posInView.z));
+    // ここで同期を取ることでタイルの最大・最小深度を正しいものにする
+    GroupMemoryBarrierWithGroupSync();
 
     // step-12 タイルの視錘台を構成する6つの平面を求める
+    float4 frustumPlanes[6];
+    
+    // この関数の中で、視錘台を構成する6つ平面を計算している
+    GetTileFrustumPlane(frustumPlanes, groupId);
 
     // step-13 タイルとポイントライトの衝突判定を行う
+    for (uint lightIndex = groupIndex; lightIndex < numPointLight; lightIndex += TILE_SIZE)
+    {
+        PointLight light = pointLight[lightIndex];
 
+        // タイルとの判定
+        bool inFrustum = true;
+        for (uint i = 0; i < 6; ++i)
+        {
+            // ライトの座標と平面の法線とで内積を使って、
+            // ライトと平面との距離（正負あり）を計算する
+            float4 lp = float4(light.positionInView, 1.0f);
+            float d = dot(frustumPlanes[i], lp);
+
+            // ライトと平面の距離を使って、衝突判定を行う
+            inFrustum = inFrustum && (d >= -light.range);
+        }
+
+        // タイルと衝突している場合
+        if (inFrustum)
+        {
+            // 衝突したポイントライトの番号を影響リストに積んでいく
+            uint listIndex;
+            InterlockedAdd(sTileNumLights, 1, listIndex);
+            sTileLightIndices[listIndex] = lightIndex;
+        }
+    }
+
+    // ここで同期を取ると、sTileLightIndicesに
+    // タイルと衝突しているライトのインデックスが積まれている
+    GroupMemoryBarrierWithGroupSync();
+    
     // step-14 ライトインデックスを出力バッファーに出力
+    uint numCellX = (screenParam.z + TILE_WIDTH - 1) / TILE_WIDTH;
+    uint tileIndex = floor(frameUV.x / TILE_WIDTH) + floor(frameUV.y / TILE_WIDTH) * numCellX;
+    uint lightStart = numPointLight * tileIndex;
+    for (uint lightIndex = groupIndex; lightIndex < sTileNumLights; lightIndex += TILE_SIZE)
+    {
+        rwLightIndices[lightStart + lightIndex] = sTileLightIndices[lightIndex];
+    }
 
     // step-15 最後に番兵を設定する
+    if ((groupIndex == 0) && (sTileNumLights < numPointLight))
+    {
+        // -1で番兵
+        rwLightIndices[lightStart + sTileNumLights] = 0xffffffff;
+    }
 
 }
