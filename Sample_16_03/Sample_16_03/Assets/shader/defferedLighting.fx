@@ -1,3 +1,5 @@
+#define TBR
+
 cbuffer cb : register(b0)
 {
     float4x4 mvp;
@@ -168,7 +170,7 @@ float4 PSMain(PSInput In) : SV_Target0
     }
 
     // step-18 ポイントライトを計算
-#if 1
+#ifdef TBR
 
     for (uint lightListIndex = lightStart; lightListIndex < lightEnd; lightListIndex++)
     {

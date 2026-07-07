@@ -178,6 +178,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
         // レンダリング開始
         g_engine->BeginFrame();
+        InitLight(light);
 
         //////////////////////////////////////
         // ここから絵を描くコードを記述する

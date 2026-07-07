@@ -142,6 +142,65 @@ float3 CalcDirectionLight(SPSIn psIn)
 float3 CalcPointLight(SPSIn psIn)
 {
     // step-5 作成したライトのリストを使って、ポイントライトを計算する
+        // タイルの幅と高さ
+    const int TILE_WIDTH = 16;
+    const int TILE_HEIGHT = 16;
+
+    // スクリーンの左上を(0,0)、右下を(1,1)とする座標系に変換する
+    // ビューポート座標系に変換する
+    float2 viewportPos = psIn.pos.xy;
+
+    // スクリーンをタイルで分割したときのセルのX座標を求める
+    uint numCellX = (screenParam.z + TILE_WIDTH - 1) / TILE_WIDTH;
+
+    // タイルインデックスを計算する
+    uint tileIndex = floor(viewportPos.x / TILE_WIDTH) + floor(viewportPos.y / TILE_WIDTH) * numCellX;
+
+    // このピクセルが含まれるタイルのライトインデックスリストの開始位置を計算する
+    uint lightStart = tileIndex * numPointLight;
+
+    // このピクセルが含まれるタイルのライトインデックスリストの終了位置を計算する
+    uint lightEnd = lightStart + numPointLight;
+
+    float3 lig = 0.0f;
+    float3 toEye = normalize(eyePos - psIn.worldPos.xyz);
+    for (uint lightListIndex = lightStart;
+        lightListIndex < lightEnd;
+        lightListIndex++)
+    {
+        uint ligNo = pointLightListInTile[lightListIndex];
+        if (ligNo == 0xffffffff)
+        {
+            // このタイルに含まれるポイントライトはもうない
+            break;
+        }
+        // 拡散反射を計算
+        // 1. 光源からサーファイスに入射するベクトルを計算
+        float3 ligDir = normalize(psIn.worldPos - pointLight[ligNo].position);
+
+        // 2. 光源からサーフェイスまでの距離を計算
+        float distance = length(psIn.worldPos - pointLight[ligNo].position);
+
+        // 3. 影響率を計算する。影響率は0.0～1.0の範囲で、
+        //    指定した距離（pointsLights[i].range）を超えたら、影響率は0.0になる
+        float affect = 1.0f - min(1.0f, distance / pointLight[ligNo].range);
+
+        // 4. 拡散反射光を加算
+        lig += CalcLambertReflection(
+            ligDir,
+            pointLight[ligNo].color,
+            psIn.normal) * affect;
+
+        // スペキュラ反射を加算
+        lig += CalcSpecularReflection(
+            ligDir,
+            pointLight[ligNo].color,
+            psIn.normal,
+            toEye) * affect;
+    }
+    return lig;
+    
+    
 }
 
 /// <summary>

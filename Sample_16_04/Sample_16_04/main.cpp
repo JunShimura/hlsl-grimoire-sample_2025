@@ -145,6 +145,77 @@ public:
 };
 
 // step-1 zprepassクラスを作成
+class ZPrepass
+{
+private:
+    RenderTarget m_depthRT; // 深度値を書き込むレンダリングターゲット
+    Model m_teapotModel;    // ティーポットのモデル
+    Model m_bgModel;        // 背景モデル
+
+public:
+    RenderTarget& GetDepthRenderTarget()
+    {
+        return m_depthRT;
+    }
+
+    void Init()
+    {
+        // 深度値を書き込むレンダリングターゲットを作成
+        m_depthRT.Create(
+            FRAME_BUFFER_W,
+            FRAME_BUFFER_H,
+            1,
+            1,
+            DXGI_FORMAT_R32_FLOAT,
+            DXGI_FORMAT_D32_FLOAT
+        );
+
+        // モデルを初期化
+        ModelInitData teapotModelInitData;
+        teapotModelInitData.m_tkmFilePath = "Assets/modelData/teapot.tkm";
+
+        // シェーダーをZPrepass用にする
+        teapotModelInitData.m_fxFilePath = "Assets/shader/zprepass.fx";
+        // 出力先のカラーバッファのフォーマットを指定する。
+        teapotModelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
+        m_teapotModel.Init(teapotModelInitData);
+
+        // 背景のモデルを初期化
+        ModelInitData bgModelInitData;
+        bgModelInitData.m_tkmFilePath = "Assets/modelData/bg.tkm";
+
+        // シェーダーをZPrepass用にする
+        bgModelInitData.m_fxFilePath = "Assets/shader/zprepass.fx";
+        // 出力先のカラーバッファのフォーマットを指定する。
+        bgModelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
+        m_bgModel.Init(bgModelInitData);
+    }
+
+    void Draw(RenderContext& renderContext)
+    {
+        // レンダリングターゲットを切り替えてドロー
+        RenderTarget* rts[] = {
+            &m_depthRT
+        };
+        renderContext.WaitUntilToPossibleSetRenderTargets(1, rts);
+
+        // レンダリングターゲットを設定
+        renderContext.SetRenderTargets(1, rts);
+
+        // レンダリングターゲットをクリア
+        renderContext.ClearRenderTargetViews(1, rts);
+
+        m_teapotModel.Draw(renderContext);
+        m_bgModel.Draw(renderContext);
+
+        // レンダリングターゲットへの書き込み待ち
+        renderContext.WaitUntilFinishDrawingToRenderTargets(1, rts);
+
+        // レンダリング先をフレームバッファに戻す
+        g_graphicsEngine->ChangeRenderTargetToFrameBuffer(renderContext);
+    }
+};
+
 
 /////////////////////////////////////////////////////////////////
 //関数宣言
@@ -181,6 +252,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     InitLight(light);
 
     // step-2 ZPrepassクラスのオブジェクトを作成して初期化する
+    ZPrepass zprepass;
+    zprepass.Init();
 
     // ライトカリングの初期化
     LightCulling lightCulling;
@@ -220,6 +293,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         }
 
         // step-3 ZPrepass→ライトカリング→フォワードレンダリングの実行
+		// ZPrepass実行
+        zprepass.Draw(renderContext);
+
+		// ライトカリングをディスパッチ
+		lightCulling.Dispatch(renderContext);
+
+		// フォワードレンダリング
+		teapotModel.Draw(renderContext);
+		bgModel.Draw(renderContext);
 
         /////////////////////////////////////////
         // 絵を描くコードを書くのはここまで！！！
