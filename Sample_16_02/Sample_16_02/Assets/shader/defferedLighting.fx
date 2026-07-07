@@ -19,7 +19,7 @@ struct PointLight
     float range;        // 範囲
 };
 
-static const int NUM_POINT_LIGHT = 2000;    // ポイントライトの数
+static const int NUM_POINT_LIGHT = 1000;    // ポイントライトの数
 static const int NUM_DIRECTION_LIGHT = 4;   // ディレクションライトの数
 
 cbuffer Light : register(b1)

@@ -25,7 +25,7 @@ struct alignas(16) PointLight
     float range;        // ライトの影響を与える範囲
 };
 
-const int NUM_POINT_LIGHT = 2000;   // ポイントライトの数
+const int NUM_POINT_LIGHT = 1000;   // ポイントライトの数
 const int NUM_DIRECTION_LIGHT = 4;  // ディレクションライトの数
 
 // ライト構造体
