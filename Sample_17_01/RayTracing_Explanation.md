@@ -37,10 +37,12 @@ main()関数起動
 	↓
 [DirectX 12初期化]  ← GraphicsEngine::Init()内で実行
 	↓
-[ゲームループ開始]
-	├─ BeginFrame() ... レンダリング開始準備
+// 初期化フェーズ（ゲームループの前に一度だけ行う処理）
 	├─ Step-1: RegistModelToRaytracingWorld(model)  ... モデル登録
 	├─ Step-2: BuildRaytracingWorld(renderContext)  ... BLAS/TLAS構築
+	↓
+[ゲームループ開始]
+	├─ BeginFrame() ... レンダリング開始準備
 	├─ Step-3: DispatchRaytracing(renderContext)    ... レイディスパッチ
 	│  ├─ Ray Generation Shader実行
 	│  ├─ Closest Hit / Miss Shader実行

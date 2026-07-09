@@ -22,8 +22,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     //////////////////////////////////////
 
     // step-1 モデルをレイトレワールドに追加する
+    // まずは普通にモデルをロードする
+	ModelInitData modelInitData;
+	modelInitData.m_tkmFilePath = "Assets/modelData/sample.tkm";
+	Model model;
+	model.Init(modelInitData);
+
+	// modelをレイトレワールドに登録する
+	g_graphicsEngine->RegistModelToRaytracingWorld(model);
 
     // step-2 登録されたモデルを使ってレイトレワールドを構築
+	g_graphicsEngine->BuildRaytracingWorld(renderContext);
 
     //////////////////////////////////////
     // 初期化を行うコードを書くのはここまで！！！
@@ -56,6 +65,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         //////////////////////////////////////
 
         // step-3 レイをディスパッチ
+		g_graphicsEngine->DispatchRaytracing(renderContext);
 
         //////////////////////////////////////
         // 絵を描くコードを書くのはここまで！！！

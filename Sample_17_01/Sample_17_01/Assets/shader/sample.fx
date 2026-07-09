@@ -11,6 +11,12 @@ struct RayPayload
 void chs(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attribs)
 {
     // step-4 レイと衝突した点の色を計算する
+    float3 barycentrics;
+    barycentrics.x = 1.0f - attribs.barycentrics.x - attribs.barycentrics.y;
+    barycentrics.y = attribs.barycentrics.y;
+    barycentrics.z = attribs.barycentrics.x;
+    
+    payload.color = barycentrics;
 }
 
 /////////////////////////////////////////////////////////////////
@@ -20,6 +26,7 @@ void chs(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attr
 void miss(inout RayPayload payload)
 {
     // step-5 レイがポリゴンが衝突しなかった時のカラーを計算する
+    payload.color = float3(1.0f, 0.0f, 0.0f);
 }
 
 // カメラ構造体
