@@ -77,7 +77,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #### 1-1. D3Dデバイスの作成
 **データ構造**: `ID3D12Device5*` 
 **説明**: DirectX 12のメインインターフェース。GPUリソースの作成やコマンド発行の管理を行います。
-**API**: [ID3D12Device5](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nn-d3d12-id3d12device5)
+**API**: [ID3D12Device5](https://learn.microsoft.com/windows/win32/api/d3d12/nn-d3d12-id3d12device5)
 
 ```cpp
 bool GraphicsEngine::CreateD3DDevice(IDXGIFactory4* dxgiFactory)
@@ -90,7 +90,7 @@ bool GraphicsEngine::CreateD3DDevice(IDXGIFactory4* dxgiFactory)
 #### 1-2. コマンドキューの作成
 **データ構造**: `ID3D12CommandQueue*`
 **説明**: GPUに実行コマンドを送信するキューです。コマンドリストに記録されたコマンドをGPUに送信します。
-**API**: [ID3D12CommandQueue](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nn-d3d12-id3d12commandqueue)
+**API**: [ID3D12CommandQueue](https://learn.microsoft.com/windows/win32/api/d3d12/nn-d3d12-id3d12commandqueue)
 
 ```cpp
 D3D12_COMMAND_QUEUE_DESC queueDesc = {};
@@ -102,7 +102,7 @@ m_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue));
 #### 1-3. スワップチェインの作成
 **データ構造**: `IDXGISwapChain3*`
 **説明**: フロントバッファとバックバッファを切り替えて、ちらつきのないアニメーション表示を実現します。
-**API**: [IDXGISwapChain3](https://learn.microsoft.com/ja-jp/windows/win32/api/dxgi1_3/nn-dxgi1_3-idxgiswapchain3)
+**API**: [IDXGISwapChain3](https://learn.microsoft.com/windows/win32/api/dxgi1_3/nn-dxgi1_3-idxgiswapchain3)
 
 #### 1-4. ディスクリプタヒープの作成
 **データ構造**: `ID3D12DescriptorHeap*`
@@ -119,12 +119,12 @@ m_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_descriptorHeap));
 #### 1-5. コマンドリストの作成
 **データ構造**: `ID3D12GraphicsCommandList4*`
 **説明**: GPU実行コマンドを記録します。描画コマンド、リソースのバリア設定、計算シェーダーの実行など、すべてのGPU処理はコマンドリストに記録されます。
-**API**: [ID3D12GraphicsCommandList4](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nn-d3d12-id3d12graphicscommandlist4)
+**API**: [ID3D12GraphicsCommandList4](https://learn.microsoft.com/windows/win32/api/d3d12/nn-d3d12-id3d12graphicscommandlist4)
 
 #### 1-6. フェンスの作成（GPUとCPUの同期用）
 **データ構造**: `ID3D12Fence*`
 **説明**: GPUとCPUの処理タイミングを同期させるためのオブジェクトです。GPUが特定の処理を完了したことを確認するために使用されます。
-**API**: [ID3D12Fence](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nn-d3d12-id3d12fence)
+**API**: [ID3D12Fence](https://learn.microsoft.com/windows/win32/api/d3d12/nn-d3d12-id3d12fence)
 
 ---
 
@@ -165,7 +165,7 @@ void World::RegistGeometry(Model& model)
 
 **データ構造**: `D3D12_RAYTRACING_GEOMETRY_DESC`
 **説明**: レイトレーシング用のジオメトリ情報を定義します。頂点バッファとインデックスバッファの情報を指定し、レイ-ポリゴン交差判定用のデータを構築します。
-**API**: [D3D12_RAYTRACING_GEOMETRY_DESC](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_geometry_desc)
+**API**: [D3D12_RAYTRACING_GEOMETRY_DESC](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_geometry_desc)
 
 ```cpp
 D3D12_RAYTRACING_GEOMETRY_DESC desc;
@@ -179,50 +179,63 @@ desc.Triangles.Transform3x4 = 0;
 
 // 頂点バッファの情報を設定
 const auto& vertexBufferView = mesh.m_vertexBuffer.GetView();
+// GPU仮想アドレス（ID3D12Resource::GetGPUVirtualAddress()から取得される値）を直接使う
+// これにより、加速構造の構築時にGPUが頂点データへアクセスできるようにする
 desc.Triangles.VertexBuffer.StartAddress = vertexBufferView.BufferLocation;
+// 1頂点あたりのバイト数（頂点構造体のサイズ）。インターリーブされた頂点レイアウトでも正しいストライドを指定する
 desc.Triangles.VertexBuffer.StrideInBytes = vertexBufferView.StrideInBytes;
+// 総頂点数はバッファサイズ / ストライドで計算できる
 desc.Triangles.VertexCount = vertexBufferView.SizeInBytes / vertexBufferView.StrideInBytes;
 
-// 頂点フォーマットを指定
+// 頂点フォーマットを指定（位置のみを使う場合の例）
+// 頂点バッファに法線やUVも含まれる場合でも、ここではレイ-三角形交差で必要な位置データのフォーマットを指定する
 desc.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
 
 // オプティマイゼーションフラグを指定（透過なし＝opaque）
+// OPAQUEを指定すると、トラバースやヒット時の最適化が行われる。
+// 透明や透過処理が必要なジオメトリはOPAQUEを外す（またはALLOW_ANY）ことを検討する
 desc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
 
 // インデックスバッファの情報を設定
 const auto& indexBufferView = mesh.m_indexBufferArray[i]->GetView();
+// インデックスもGPU仮想アドレスで指定
 desc.Triangles.IndexBuffer = indexBufferView.BufferLocation;
+// インデックスの総数（トライアングル構成に応じて3の倍数であることが多い）
 desc.Triangles.IndexCount = mesh.m_indexBufferArray[i]->GetCount();
+// 16bitか32bitかを指定（例: DXGI_FORMAT_R16_UINT または DXGI_FORMAT_R32_UINT）
 desc.Triangles.IndexFormat = indexBufferView.Format;
 ```
 
-**主要なメンバ変数の説明**:
+**詳細解説（初心者向け）**:
+- GPU仮想アドレスとは: ID3D12Resourceが保持するGPU側でのアドレスで、CPU側のポインタとは異なる。加速構造の記述ではこのアドレスを使ってGPUが直接頂点/インデックスへアクセスする。
+- ストライドとフォーマット: 頂点バッファが {position, normal, uv} のように複数要素を持つ場合でも、StrideInBytesは1頂点分のバイト数を指す。VertexFormatはレイトレーシングが必要とする頂点の要素（通常は位置）を表す。
+- インデックス形式の差: 16ビットインデックスはメモリ節約になるが、頂点数が多い場合は32ビットが必要になる。IndexCountはインデックスの総数（頂点参照回数）を指定する。
+- リソースの状態: 加速構造を構築する前に、頂点/インデックスバッファはGPUが読み出せる状態（たとえば D3D12_RESOURCE_STATE_GENERIC_READ や D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE 等）になっている必要がある。必要に応じて ID3D12GraphicsCommandList::ResourceBarrier で遷移を行う。
 
-| メンバ | 説明 |
-|--------|------|
-| `Type` | ジオメトリのタイプ。`D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES`（三角形）を指定 |
-| `Triangles.VertexBuffer.StartAddress` | 頂点バッファの開始アドレス（GPU仮想アドレス） |
-| `Triangles.VertexBuffer.StrideInBytes` | 頂点間のバイト数。1頂点のサイズ |
-| `Triangles.VertexCount` | 頂点の総数 |
-| `Triangles.VertexFormat` | 頂点座標のフォーマット。`DXGI_FORMAT_R32G32B32_FLOAT`は3要素の32ビット浮動小数点 |
-| `Triangles.IndexBuffer` | インデックスバッファの開始アドレス |
-| `Triangles.IndexCount` | インデックスの総数 |
-| `Triangles.IndexFormat` | インデックスのフォーマット。16ビットまたは32ビット |
-| `Flags` | 最適化フラグ。`D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE`は透過なし |
+**注意点とベストプラクティス**:
+- 頂点バッファのオフセット: 一部の実装では頂点配列の先頭に余分なヘッダや別データがある場合があるため、StartAddressは適切なオフセットを指していることを確認する。
+- 逆順（Winding）とカリング: レイトレーシングでも三角形の向きは重要になる場合がある。モデルの頂点順序が期待通りか、カリング設定に合わせる必要がある。
+- ジオメトリフラグ: D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE の他に、ALLOW_UPDATE や NO_DUPLICATE_ANY_HIT_INVOCATION 等のフラグがあり、用途に応じて設定できる。
 
 #### 1-3. Instanceの生成
 
 ```cpp
+// 加速構造構築で使用するためのインスタンス（メッシュ＋マテリアル）を作成
 InstancePtr instance = std::make_unique<Instance>();
-instance->geometoryDesc = desc;
-instance->m_material = mesh.m_materials[i];
+instance->geometoryDesc = desc; // 構築したジオメトリ記述を保持
+instance->m_material = mesh.m_materials[i]; // ピクセルやシェーダーで使うマテリアル情報を参照
+
+// RWSBはこのサンプル内のラッパー（読み出し用GPUバッファを管理）
+// BLASを構築する際、頂点/インデックスのGPUアドレスが必要になるため、
+// 元のバッファ資源を保持しておくラッパーを用意している
 instance->m_vertexBufferRWSB.Init(mesh.m_vertexBuffer, false);
 instance->m_indexBufferRWSB.Init(*mesh.m_indexBufferArray[i], false);
 
 m_instances.emplace_back(std::move(instance));
 ```
 
-**概要**: 各メッシュに対して、`Instance`オブジェクトを生成し、ジオメトリ情報とマテリアル情報を保持させます。このインスタンスのリストが、後段の加速構造構築フェーズで使用されます。
+- これらのInstanceは、BuildRaytracingWorld() の呼び出し時に BLAS/TLAS の入力としてまとめて参照される。順序は重要で、登録が完了してから加速構造を構築する必要がある。
+- Instance は TLAS 内での InstanceID やシェーダーヒットグループへの対応付け（InstanceContributionToHitGroupIndex）などの情報と合わせて使用される。
 
 ---
 
@@ -258,11 +271,11 @@ void BLASBuffer::Init(RenderContext& rc, const std::vector<InstancePtr>& instanc
 
 **処理フロー**:
 1. `D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC`構造体を作成
-2. `ID3D12Device5::BuildRaytracingAccelerationStructure()`を呼び出しBLASを構築
+
 3. 構築結果を`AccelerationStructureBuffers`に格納
 
 **関連API**: 
-- [D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_build_raytracing_acceleration_structure_desc)
+- [D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_build_raytracing_acceleration_structure_desc)
 
 #### 2-2. TLAS（Top Level Acceleration Structure）の構築
 
@@ -284,7 +297,7 @@ void TLASBuffer::Init(RenderContext& rc, const std::vector<InstancePtr>& instanc
 3. `ID3D12Device5::BuildRaytracingAccelerationStructure()`を呼び出しTLASを構築
 
 **関連API**: 
-- [D3D12_RAYTRACING_INSTANCE_DESC](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_instance_desc)
+- [D3D12_RAYTRACING_INSTANCE_DESC](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_instance_desc)
 
 **D3D12_RAYTRACING_INSTANCE_DESCのメンバ説明**:
 
@@ -316,7 +329,7 @@ g_graphicsEngine->DispatchRaytracing(renderContext);
 
 **データ構造**: `ID3D12StateObject*`
 **説明**: PSO（パイプラインステートオブジェクト）は、GPUのパイプライン設定を一括管理するオブジェクトです。レイトレーシング用のPSOには、Ray Generation ShaderやHit Shaderなど、複数のシェーダーを関連付ける情報が含まれます。
-**API**: [ID3D12StateObject](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nn-d3d12-id3d12stateobject)
+**API**: [ID3D12StateObject](https://learn.microsoft.com/windows/win32/api/d3d12/nn-d3d12-id3d12stateobject)
 
 ```cpp
 void PSO::Init(const DescriptorHeaps& descriptorHeaps)
@@ -355,7 +368,7 @@ void PSO::Init(const DescriptorHeaps& descriptorHeaps)
 
 #### 3-4. DispatchRaysコマンドの実行
 
-**API**: [ID3D12GraphicsCommandList4::DispatchRays](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist4-dispatchrays)
+**API**: [ID3D12GraphicsCommandList4::DispatchRays](https://learn.microsoft.com/windows/win32/api/d3d12/nf-d3d12-id3d12graphicscommandlist4-dispatchrays)
 
 ```cpp
 D3D12_DISPATCH_RAYS_DESC dispatchDesc = {};
@@ -492,7 +505,7 @@ void rayGen()
 ```
 
 **TraceRay APIについて**:
-**API**: [TraceRay](https://learn.microsoft.com/ja-jp/windows/win32/direct3dhlsl/traceray-function)
+**API**: [TraceRay](https://learn.microsoft.com/windows/win32/direct3dhlsl/traceray-function)
 
 TraceRayは、HLSL内でレイを投射し、加速構造（TLAS）との交差判定を実行する関数です。以下の処理を行います：
 
@@ -565,7 +578,7 @@ cbuffer rayGenCB :register(b0)
 - `CreateStateObject()`: レイトレーシング用のState Objectを作成
 - `GetRaytracingAccelerationStructurePrebuildInfo()`: 加速構造の構築情報を取得
 
-**リンク**: [ID3D12Device5 - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nn-d3d12-id3d12device5)
+**リンク**: [ID3D12Device5 - Microsoft Learn](https://learn.microsoft.com/windows/win32/api/d3d12/nn-d3d12-id3d12device5)
 
 #### 2. D3D12_RAYTRACING_GEOMETRY_DESC
 **説明**: レイトレーシング用のジオメトリ情報を定義します。
@@ -583,7 +596,7 @@ struct D3D12_RAYTRACING_GEOMETRY_DESC
 };
 ```
 
-**リンク**: [D3D12_RAYTRACING_GEOMETRY_DESC - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_geometry_desc)
+**リンク**: [D3D12_RAYTRACING_GEOMETRY_DESC - Microsoft Learn](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_geometry_desc)
 
 #### 3. D3D12_RAYTRACING_GEOMETRY_TRIANGLES_DESC
 **説明**: 三角形メッシュのジオメトリ情報を指定します。
@@ -603,7 +616,7 @@ struct D3D12_RAYTRACING_GEOMETRY_TRIANGLES_DESC
 };
 ```
 
-**リンク**: [D3D12_RAYTRACING_GEOMETRY_TRIANGLES_DESC - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_geometry_triangles_desc)
+**リンク**: [D3D12_RAYTRACING_GEOMETRY_TRIANGLES_DESC - Microsoft Learn](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_geometry_triangles_desc)
 
 #### 4. D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC
 **説明**: 加速構造（BLAS/TLAS）の構築パラメータを定義します。
@@ -619,7 +632,7 @@ struct D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC
 };
 ```
 
-**リンク**: [D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_build_raytracing_acceleration_structure_desc)
+**リンク**: [D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC - Microsoft Learn](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_build_raytracing_acceleration_structure_desc)
 
 #### 5. D3D12_RAYTRACING_INSTANCE_DESC
 **説明**: TLAS内のインスタンス（BLASの参照）情報を定義します。
@@ -645,7 +658,7 @@ struct D3D12_RAYTRACING_INSTANCE_DESC
 - `Flags`: インスタンスのフラグ
 - `AccelerationStructure`: このインスタンスが参照するBLASのGPUアドレス
 
-**リンク**: [D3D12_RAYTRACING_INSTANCE_DESC - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_instance_desc)
+**リンク**: [D3D12_RAYTRACING_INSTANCE_DESC - Microsoft Learn](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_raytracing_instance_desc)
 
 #### 6. ID3D12StateObject
 **説明**: レイトレーシング用のパイプラインステートオブジェクト。複数のシェーダーとルートシグネチャを関連付けます。
@@ -656,7 +669,7 @@ struct D3D12_RAYTRACING_INSTANCE_DESC
 - Subobject（サブオブジェクト：シェーダーとルートシグネチャの関連付け）
 - Pipeline Config（パイプラインの設定）
 
-**リンク**: [ID3D12StateObject - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/nn-d3d12-id3d12stateobject)
+**リンク**: [ID3D12StateObject - Microsoft Learn](https://learn.microsoft.com/windows/win32/api/d3d12/nn-d3d12-id3d12stateobject)
 
 #### 7. D3D12_DISPATCH_RAYS_DESC
 **説明**: DispatchRaysコマンドのパラメータを定義します。
@@ -681,7 +694,7 @@ struct D3D12_DISPATCH_RAYS_DESC
 - `HitGroupTable`: Hit Groupテーブル（ストライド情報含む）
 - `Width`, `Height`, `Depth`: DispatchRaysの実行次元
 
-**リンク**: [D3D12_DISPATCH_RAYS_DESC - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ns-d3d12-d3d12_dispatch_rays_desc)
+**リンク**: [D3D12_DISPATCH_RAYS_DESC - Microsoft Learn](https://learn.microsoft.com/windows/win32/api/d3d12/ns-d3d12-d3d12_dispatch_rays_desc)
 
 #### 8. RayDesc（HLSL）
 **説明**: HLSLシェーダー内でレイを定義する構造体。
@@ -702,7 +715,7 @@ struct RayDesc
 - `Direction`: レイの方向（正規化されていることが推奨）
 - `TMax`: レイの最大距離
 
-**リンク**: [RayDesc - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/direct3dhlsl/raydesc-structure)
+**リンク**: [RayDesc - Microsoft Learn](https://learn.microsoft.com/windows/win32/direct3dhlsl/raydesc-structure)
 
 #### 9. BuiltInTriangleIntersectionAttributes（HLSL）
 **説明**: Hit Shaderに渡される、三角形との交差情報。
@@ -714,7 +727,7 @@ struct BuiltInTriangleIntersectionAttributes
 };
 ```
 
-**リンク**: [BuiltInTriangleIntersectionAttributes - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/direct3dhlsl/builtintriangleintersectionattributes)
+**リンク**: [BuiltInTriangleIntersectionAttributes - Microsoft Learn](https://learn.microsoft.com/windows/win32/direct3dhlsl/builtintriangleintersectionattributes)
 
 #### 10. TraceRay（HLSL）
 **説明**: HLSLシェーダー内でレイを投射し、加速構造との交差判定を実行。
@@ -742,7 +755,7 @@ void TraceRay(
 - `Ray`: 投射するレイの定義
 - `Payload`: 結果を格納するユーザー定義構造体
 
-**リンク**: [TraceRay - Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/win32/direct3dhlsl/traceray-function)
+**リンク**: [TraceRay - Microsoft Learn](https://learn.microsoft.com/windows/win32/direct3dhlsl/traceray-function)
 
 ---
 
@@ -763,7 +776,8 @@ RayTracing によるレンダリングは、以下のステップで実現され
 ---
 
 **参考リンク**:
-- [Microsoft Learn - Direct3D 12 API Reference](https://learn.microsoft.com/ja-jp/windows/win32/direct3d12/direct3d-12-graphics-reference)
+- [Microsoft Learn - Direct3D 12 API Reference](https://learn.microsoft.com/ja-jp/windows/win32/direct3d12/direct3d-12-reference)
 - [Microsoft Learn - Direct3D 12 Ray Tracing](https://learn.microsoft.com/ja-jp/windows/win32/direct3d12/direct3d-12-ray-tracing)
-- [NVIDIA DXR Tutorials](https://docs.nvidia.com/rtx/raytracing/dxr/)
+- [NVIDIA DXR Tutorials](https://developer.nvidia.com/rtx/raytracing/dxr/DX12-Raytracing-tutorial-Part-1)
+
 
