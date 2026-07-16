@@ -1,0 +1,4 @@
+{
+  "root": true,
+  "hlsl.targetProfile": "lib_6_3"
+}

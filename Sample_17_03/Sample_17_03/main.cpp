@@ -31,6 +31,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     g_graphicsEngine->RegistModelToRaytracingWorld(humanModel);
 
     // step-1 背景モデルをロードしてレイトレワールドに追加する
+	// 背景モデルをロードする
+	ModelInitData bgdModelInitData;
+    bgdModelInitData.m_tkmFilePath = "Assets/modelData/bg/bg.tkm";
+    Model bgdModel;
+    bgdModel.Init(bgdModelInitData);
+
+    // 背景モデルをレイトレワールドに追加
+    g_graphicsEngine->RegistModelToRaytracingWorld(bgdModel);
 
     // レイトレワールドを構築
     g_graphicsEngine->BuildRaytracingWorld(renderContext);

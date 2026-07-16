@@ -57,6 +57,12 @@ void chs(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attr
                 + uv2 * barycentrics.z;
 
     // step-4 求めたUV座標を使ってテクスチャカラーをサンプリングする
+    payload.color = g_albedoTexture.SampleLevel(
+        g_samplerState,
+        uv,
+        0.0f
+        );
+    
 
 }
 
