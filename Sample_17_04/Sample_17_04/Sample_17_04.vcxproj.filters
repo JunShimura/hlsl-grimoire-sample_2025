@@ -305,4 +305,7 @@
       <Filter>MiniEngine\font</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Docs\ray_boundary_miss_analysis.md" />
+  </ItemGroup>
 </Project>
