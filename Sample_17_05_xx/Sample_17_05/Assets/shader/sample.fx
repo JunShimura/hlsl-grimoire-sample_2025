@@ -196,6 +196,7 @@ void TraceReflectionRay(inout RayPayload raypayload, float3 normal)
 void TraceRefractionRay(
     inout RayPayload raypayload,
     float3 normal,
+    float2 uv,
     out float3 orientedNormal,
     out float fresnel)
 {
@@ -209,8 +210,14 @@ void TraceRefractionRay(
         float3 rayDirW = normalize(WorldRayDirection());
         float3 rayOriginW = WorldRayOrigin();
 
-        // 屈折率（即値で定義）
-        const float kRefractiveIndex = 1.52f; // 例: ガラス
+        // 屈折率(マップから取得)
+        // ※ refractionMapには屈折率を格納する想定 (1.0~2.5程度の範囲)
+        float kRefractiveIndex = g_refractionMap.SampleLevel(s, uv, 0.0f).r;
+        // デフォルト値がゼロの場合はガラスの屈折率を使用
+        if(kRefractiveIndex < 1.0f)
+        {
+            kRefractiveIndex = 1.52f; // 例: ガラス
+        }
 
         float etaI = 1.0f;
         float etaT = kRefractiveIndex;
@@ -364,22 +371,22 @@ void chs(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attr
 
     float3 orientedNormal;
     float fresnel;
-    TraceRefractionRay(refrPayload, normal, orientedNormal, fresnel);
+    TraceRefractionRay(refrPayload, normal, uv, orientedNormal, fresnel);
 
     // 反射レイ
     TraceReflectionRay(refPayload, orientedNormal);
 
     // このプリミティブの反射率と屈折率を取得
-    // float reflectRate = g_reflectionMap.SampleLevel(s, uv, 0.0f).r;
-    // float refractRate = g_refractionMap.SampleLevel(s, uv, 0.0f).r;
+    float reflectRate = g_reflectionMap.SampleLevel(s, uv, 0.0f).r;
+    float refractRate = g_refractionMap.SampleLevel(s, uv, 0.0f).r;
 	
     // 仮の値をいれる
-    const float reflectRate = 0.25f;
-	const float refractRate = 1.52f;
+    // const float reflectRate = 0.50f;
+	// const float refractRate = 1.52f;
     
     float3 color = gAlbedoTexture.SampleLevel(s, uv, 0.0f).rgb;
     // color *= lig;
-    const float kAlbedoStrength = 0.25f;
+    const float kAlbedoStrength = 0.75f;
     color *= lig * kAlbedoStrength;
 
     // 反射と屈折を合成して最終カラーを決定する

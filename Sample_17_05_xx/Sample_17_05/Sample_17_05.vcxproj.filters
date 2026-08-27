@@ -305,4 +305,7 @@
       <Filter>MiniEngine\font</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\shader\sample_fx_guide.md" />
+  </ItemGroup>
 </Project>
