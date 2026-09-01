@@ -377,12 +377,12 @@ void chs(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attr
     TraceReflectionRay(refPayload, orientedNormal);
 
     // このプリミティブの反射率と屈折率を取得
-    float reflectRate = g_reflectionMap.SampleLevel(s, uv, 0.0f).r;
-    float refractRate = g_refractionMap.SampleLevel(s, uv, 0.0f).r;
+    //float reflectRate = g_reflectionMap.SampleLevel(s, uv, 0.0f).r;
+    //float refractRate = g_refractionMap.SampleLevel(s, uv, 0.0f).r;
 	
     // 仮の値をいれる
-    // const float reflectRate = 0.50f;
-	// const float refractRate = 1.52f;
+    const float reflectRate = 0.50f;
+	const float refractRate = 1.52f;
     
     float3 color = gAlbedoTexture.SampleLevel(s, uv, 0.0f).rgb;
     // color *= lig;
